@@ -52,7 +52,7 @@ func (n *TextParseNode) GetCollectionOfPrimitiveValues(targetType string) ([]int
 }
 
 // GetCollectionOfEnumValues returns the collection of Enum values from the node.
-func (n *TextParseNode) GetCollectionOfEnumValues(parser func(string) (interface{}, error)) ([]interface{}, error) {
+func (n *TextParseNode) GetCollectionOfEnumValues(parser absser.EnumFactory) ([]interface{}, error) {
 	return nil, NoStructuredDataError
 }
 
@@ -218,7 +218,7 @@ func (n *TextParseNode) GetUUIDValue() (*uuid.UUID, error) {
 }
 
 // GetEnumValue returns a Enum value from the nodes.
-func (n *TextParseNode) GetEnumValue(parser func(string) (interface{}, error)) (interface{}, error) {
+func (n *TextParseNode) GetEnumValue(parser absser.EnumFactory) (interface{}, error) {
 	if parser == nil {
 		return nil, errors.New("parser is nil")
 	}
