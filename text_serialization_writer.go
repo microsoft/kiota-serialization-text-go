@@ -156,7 +156,7 @@ func (w *TextSerializationWriter) WriteByteArrayValue(key string, value []byte) 
 }
 
 // WriteObjectValue writes a Parsable value to underlying the byte array.
-func (w *TextSerializationWriter) WriteObjectValue(key string, item absser.Parsable) error {
+func (w *TextSerializationWriter) WriteObjectValue(key string, item absser.Parsable, additionalValuesToMerge ...absser.Parsable) error {
 	return NoStructuredDataError
 }
 
