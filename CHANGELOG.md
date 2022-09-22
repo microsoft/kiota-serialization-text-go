@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+## [0.6.0] - 2022-09-22
+
+### Added
+
+- Implement additional serialization method `WriteAnyValues` and parse method `GetRawValue` introduced in abstractions.
+
 ## [0.5.0] - 2022-09-02
 
 ### Added

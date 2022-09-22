@@ -241,6 +241,11 @@ func (w *TextSerializationWriter) WriteAdditionalData(value map[string]interface
 	return NoStructuredDataError
 }
 
+// WriteAnyValues an unknown value as a parameter.
+func (w *TextSerializationWriter) WriteAnyValues(key string, value interface{}) error {
+	return NoStructuredDataError
+}
+
 // Close clears the internal buffer.
 func (w *TextSerializationWriter) Close() error {
 	return nil

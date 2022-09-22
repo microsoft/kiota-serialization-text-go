@@ -14,3 +14,5 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/microsoft/kiota-abstractions-go => C:\Users\ronaldkudoyi\Code\kiota-abstractions-go
