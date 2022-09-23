@@ -241,8 +241,8 @@ func (w *TextSerializationWriter) WriteAdditionalData(value map[string]interface
 	return NoStructuredDataError
 }
 
-// WriteAnyValues an unknown value as a parameter.
-func (w *TextSerializationWriter) WriteAnyValues(key string, value interface{}) error {
+// WriteAnyValue an unknown value as a parameter.
+func (w *TextSerializationWriter) WriteAnyValue(key string, value interface{}) error {
 	return NoStructuredDataError
 }
 
