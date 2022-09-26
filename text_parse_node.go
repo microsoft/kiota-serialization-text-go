@@ -243,3 +243,8 @@ func (n *TextParseNode) GetByteArrayValue() ([]byte, error) {
 	}
 	return base64.StdEncoding.DecodeString(*s)
 }
+
+// GetRawValue returns a ByteArray value from the nodes.
+func (n *TextParseNode) GetRawValue() (interface{}, error) {
+	return n.value, nil
+}
