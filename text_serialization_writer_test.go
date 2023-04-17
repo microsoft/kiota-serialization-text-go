@@ -27,6 +27,7 @@ func TestTextSerializationWriter(t *testing.T) {
 	}
 	err := serializer.SetOnBeforeSerialization(onBefore)
 	assert.NoError(t, err)
+	assert.NotNil(t, serializer.GetOnBeforeSerialization())
 
 	countAfter := 0
 	onAfter := func(parsable absser.Parsable) error {
@@ -35,6 +36,7 @@ func TestTextSerializationWriter(t *testing.T) {
 	}
 	err = serializer.SetOnAfterObjectSerialization(onAfter)
 	assert.NoError(t, err)
+	assert.NotNil(t, serializer.GetOnAfterObjectSerialization())
 
 	countStart := 0
 	onStart := func(absser.Parsable, absser.SerializationWriter) error {
@@ -44,4 +46,5 @@ func TestTextSerializationWriter(t *testing.T) {
 
 	err = serializer.SetOnStartObjectSerialization(onStart)
 	assert.NoError(t, err)
+	assert.NotNil(t, serializer.GetOnStartObjectSerialization())
 }
