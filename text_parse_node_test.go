@@ -30,4 +30,10 @@ func TestTextParseNodeHonoursInterface(t *testing.T) {
 	instance, err := NewTextParseNode(sourceArray)
 	assert.Nil(t, err)
 	assert.Implements(t, (*absser.ParseNode)(nil), instance)
+
+	err = instance.SetOnBeforeAssignFieldValues(nil)
+	assert.NoError(t, err)
+
+	err = instance.SetOnAfterAssignFieldValues(nil)
+	assert.NoError(t, err)
 }
