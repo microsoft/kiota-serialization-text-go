@@ -8,8 +8,8 @@ github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+
 github.com/kr/pretty v0.1.0 h1:L/CwN0zerZDmRFUapSPitk6f+Q3+0za1rQkzVuMiMFI=
 github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=
 github.com/kr/text v0.2.0/go.mod h1:eLer722TekiGuMkidMxC/pM04lWEeraHUUmBw8l2grE=
-github.com/microsoft/kiota-abstractions-go v1.8.0 h1:QSUA1VrOjBhqLSghIJ8KzAUWniuVvaDaNHr4yInOZ5s=
-github.com/microsoft/kiota-abstractions-go v1.8.0/go.mod h1:lYexA/dZlyiCHHilVxDadfoScjI6j8cKmrZWkq5pckw=
+github.com/microsoft/kiota-abstractions-go v1.8.1 h1:0gtK3KERmbKYm5AxJLZ8WPlNR9eACUGWuofFIa01PnA=
+github.com/microsoft/kiota-abstractions-go v1.8.1/go.mod h1:YO2QCJyNM9wzvlgGLepw6s9XrPgNHODOYGVDCqQWdLI=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/testify v1.9.0 h1:HtqpIVDClZ4nwg75+f6Lvsy/wHu+3BoSGCbBAcpTsTg=
