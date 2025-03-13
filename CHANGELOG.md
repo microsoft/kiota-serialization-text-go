@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0](https://github.com/microsoft/kiota-serialization-text-go/compare/v1.0.0...v1.1.0) (2025-03-13)
+
+
+### Features
+
+* upgrades required go version from go1.18 to go 1.22 ([c0886ad](https://github.com/microsoft/kiota-serialization-text-go/commit/c0886ad112bff2cf3fbea56dcd45922685d2e565))
+
 ## [1.0.0] - 2023-05-04
 
 ### Changed
