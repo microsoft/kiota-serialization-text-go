@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.1](https://github.com/microsoft/kiota-serialization-text-go/compare/v1.1.0...v1.1.1) (2025-03-24)
+
+
+### Bug Fixes
+
+* upgrades common go dependency to solve triming issues ([da7894d](https://github.com/microsoft/kiota-serialization-text-go/commit/da7894dfc2fc351c8337c3570f50548994624098))
+* upgrades common go dependency to solve triming issues ([c5b463c](https://github.com/microsoft/kiota-serialization-text-go/commit/c5b463c8f5308d4aea15fc520dacb6c9e6b89b7d))
+
 ## [1.1.0](https://github.com/microsoft/kiota-serialization-text-go/compare/v1.0.0...v1.1.0) (2025-03-13)
 
 
