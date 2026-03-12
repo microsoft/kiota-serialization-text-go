@@ -24,6 +24,46 @@ func TestTree(t *testing.T) {
 	assert.Equal(t, "stringValue", *stringValue)
 }
 
+func TestGetFloat32Value(t *testing.T) {
+	source := "3.14"
+	parseNode, err := NewTextParseNode([]byte(source))
+	assert.Nil(t, err)
+	val, err := parseNode.GetFloat32Value()
+	assert.Nil(t, err)
+	assert.NotNil(t, val)
+	assert.InDelta(t, float32(3.14), *val, 0.001)
+}
+
+func TestGetFloat64Value(t *testing.T) {
+	source := "3.141592653589793"
+	parseNode, err := NewTextParseNode([]byte(source))
+	assert.Nil(t, err)
+	val, err := parseNode.GetFloat64Value()
+	assert.Nil(t, err)
+	assert.NotNil(t, val)
+	assert.InDelta(t, 3.141592653589793, *val, 0.000000001)
+}
+
+func TestGetInt32Value(t *testing.T) {
+	source := "42"
+	parseNode, err := NewTextParseNode([]byte(source))
+	assert.Nil(t, err)
+	val, err := parseNode.GetInt32Value()
+	assert.Nil(t, err)
+	assert.NotNil(t, val)
+	assert.Equal(t, int32(42), *val)
+}
+
+func TestGetInt64Value(t *testing.T) {
+	source := "9876543210"
+	parseNode, err := NewTextParseNode([]byte(source))
+	assert.Nil(t, err)
+	val, err := parseNode.GetInt64Value()
+	assert.Nil(t, err)
+	assert.NotNil(t, val)
+	assert.Equal(t, int64(9876543210), *val)
+}
+
 func TestTextParseNodeHonoursInterface(t *testing.T) {
 	source := "\"stringValue\""
 	sourceArray := []byte(source)

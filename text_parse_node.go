@@ -107,14 +107,14 @@ func (n *TextParseNode) GetByteValue() (*byte, error) {
 
 // GetFloat32Value returns a Float32 value from the nodes.
 func (n *TextParseNode) GetFloat32Value() (*float32, error) {
-	v, err := n.GetFloat64Value()
+	if n == nil {
+		return nil, nil
+	}
+	val, err := strconv.ParseFloat(n.value, 32)
 	if err != nil {
 		return nil, err
 	}
-	if v == nil {
-		return nil, nil
-	}
-	cast := float32(*v)
+	cast := float32(val)
 	return &cast, nil
 }
 
@@ -123,38 +123,36 @@ func (n *TextParseNode) GetFloat64Value() (*float64, error) {
 	if n == nil {
 		return nil, nil
 	}
-	val, err := strconv.ParseFloat(n.value, 0)
+	val, err := strconv.ParseFloat(n.value, 64)
 	if err != nil {
 		return nil, err
 	}
-	cast := float64(val)
-	return &cast, nil
+	return &val, nil
 }
 
 // GetInt32Value returns a Int32 value from the nodes.
 func (n *TextParseNode) GetInt32Value() (*int32, error) {
-	v, err := n.GetFloat64Value()
+	if n == nil {
+		return nil, nil
+	}
+	val, err := strconv.ParseInt(n.value, 10, 32)
 	if err != nil {
 		return nil, err
 	}
-	if v == nil {
-		return nil, nil
-	}
-	cast := int32(*v)
-	return &cast, nil
+	result := int32(val)
+	return &result, nil
 }
 
 // GetInt64Value returns a Int64 value from the nodes.
 func (n *TextParseNode) GetInt64Value() (*int64, error) {
-	v, err := n.GetFloat64Value()
+	if n == nil {
+		return nil, nil
+	}
+	val, err := strconv.ParseInt(n.value, 10, 64)
 	if err != nil {
 		return nil, err
 	}
-	if v == nil {
-		return nil, nil
-	}
-	cast := int64(*v)
-	return &cast, nil
+	return &val, nil
 }
 
 // GetTimeValue returns a Time value from the nodes.
