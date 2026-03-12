@@ -157,63 +157,48 @@ func (n *TextParseNode) GetInt64Value() (*int64, error) {
 
 // GetTimeValue returns a Time value from the nodes.
 func (n *TextParseNode) GetTimeValue() (*time.Time, error) {
-	v, err := n.GetStringValue()
-	if err != nil {
-		return nil, err
-	}
-	if v == nil {
+	if n == nil {
 		return nil, nil
 	}
-	parsed, err := time.Parse(time.RFC3339, *v)
+	val := strings.Trim(n.value, "\"")
+	parsed, err := time.Parse(time.RFC3339, val)
 	return &parsed, err
 }
 
 // GetISODurationValue returns a ISODuration value from the nodes.
 func (n *TextParseNode) GetISODurationValue() (*absser.ISODuration, error) {
-	v, err := n.GetStringValue()
-	if err != nil {
-		return nil, err
-	}
-	if v == nil {
+	if n == nil {
 		return nil, nil
 	}
-	return absser.ParseISODuration(*v)
+	val := strings.Trim(n.value, "\"")
+	return absser.ParseISODuration(val)
 }
 
 // GetTimeOnlyValue returns a TimeOnly value from the nodes.
 func (n *TextParseNode) GetTimeOnlyValue() (*absser.TimeOnly, error) {
-	v, err := n.GetStringValue()
-	if err != nil {
-		return nil, err
-	}
-	if v == nil {
+	if n == nil {
 		return nil, nil
 	}
-	return absser.ParseTimeOnly(*v)
+	val := strings.Trim(n.value, "\"")
+	return absser.ParseTimeOnly(val)
 }
 
 // GetDateOnlyValue returns a DateOnly value from the nodes.
 func (n *TextParseNode) GetDateOnlyValue() (*absser.DateOnly, error) {
-	v, err := n.GetStringValue()
-	if err != nil {
-		return nil, err
-	}
-	if v == nil {
+	if n == nil {
 		return nil, nil
 	}
-	return absser.ParseDateOnly(*v)
+	val := strings.Trim(n.value, "\"")
+	return absser.ParseDateOnly(val)
 }
 
 // GetUUIDValue returns a UUID value from the nodes.
 func (n *TextParseNode) GetUUIDValue() (*uuid.UUID, error) {
-	v, err := n.GetStringValue()
-	if err != nil {
-		return nil, err
-	}
-	if v == nil {
+	if n == nil {
 		return nil, nil
 	}
-	parsed, err := uuid.Parse(*v)
+	val := strings.Trim(n.value, "\"")
+	parsed, err := uuid.Parse(val)
 	return &parsed, err
 }
 
@@ -222,26 +207,20 @@ func (n *TextParseNode) GetEnumValue(parser absser.EnumFactory) (interface{}, er
 	if parser == nil {
 		return nil, errors.New("parser is nil")
 	}
-	s, err := n.GetStringValue()
-	if err != nil {
-		return nil, err
-	}
-	if s == nil {
+	if n == nil {
 		return nil, nil
 	}
-	return parser(*s)
+	val := strings.Trim(n.value, "\"")
+	return parser(val)
 }
 
 // GetByteArrayValue returns a ByteArray value from the nodes.
 func (n *TextParseNode) GetByteArrayValue() ([]byte, error) {
-	s, err := n.GetStringValue()
-	if err != nil {
-		return nil, err
-	}
-	if s == nil {
+	if n == nil {
 		return nil, nil
 	}
-	return base64.StdEncoding.DecodeString(*s)
+	val := strings.Trim(n.value, "\"")
+	return base64.StdEncoding.DecodeString(val)
 }
 
 // GetRawValue returns a ByteArray value from the nodes.
