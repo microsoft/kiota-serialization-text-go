@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.4](https://github.com/microsoft/kiota-serialization-text-go/compare/v1.1.3...v1.1.4) (2026-10-16)
+
+
+### Bug Fixes
+
+* serialize text timestamps in RFC3339 format ([0287efb](https://github.com/microsoft/kiota-serialization-text-go/commit/0287efb8ab5c2a42812b95b803c81ddfc47dc1da))
+* serialize text timestamps in RFC3339 format ([887e203](https://github.com/microsoft/kiota-serialization-text-go/commit/887e2031da0039d2d1d57b3d7b7ddd5487c30d5f))
+
 ## [1.1.3](https://github.com/microsoft/kiota-serialization-text-go/compare/v1.1.2...v1.1.3) (2025-09-22)
 
 
