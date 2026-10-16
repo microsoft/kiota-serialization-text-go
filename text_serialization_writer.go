@@ -113,7 +113,7 @@ func (w *TextSerializationWriter) WriteFloat64Value(key string, value *float64) 
 // WriteTimeValue writes a Time value to underlying the byte array.
 func (w *TextSerializationWriter) WriteTimeValue(key string, value *time.Time) error {
 	if value != nil {
-		return w.writeStringValue(key, (*value).String())
+		return w.writeStringValue(key, (*value).Format(time.RFC3339Nano))
 	}
 	return nil
 }

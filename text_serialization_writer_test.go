@@ -2,10 +2,73 @@ package textserialization
 
 import (
 	"testing"
+	"time"
 
 	absser "github.com/microsoft/kiota-abstractions-go/serialization"
 	assert "github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
+
+func TestWriteTimeValueUsesRFC3339(t *testing.T) {
+	tests := []struct {
+		name  string
+		value time.Time
+		want  string
+	}{
+		{"UTC", time.Date(2026, 10, 16, 12, 34, 56, 0, time.UTC), "2026-10-16T12:34:56Z"},
+		{"nanoseconds", time.Date(2026, 10, 16, 12, 34, 56, 123456789, time.UTC), "2026-10-16T12:34:56.123456789Z"},
+		{"fractional seconds", time.Date(2026, 10, 16, 12, 34, 56, 120000000, time.UTC), "2026-10-16T12:34:56.12Z"},
+		{"positive offset", time.Date(2026, 10, 16, 12, 34, 56, 0, time.FixedZone("test", 19800)), "2026-10-16T12:34:56+05:30"},
+		{"negative offset", time.Date(2026, 10, 16, 12, 34, 56, 0, time.FixedZone("test", -14400)), "2026-10-16T12:34:56-04:00"},
+		{"zero time", time.Time{}, "0001-01-01T00:00:00Z"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			writer, err := NewTextSerializationWriterFactory().GetSerializationWriter("text/plain")
+			require.NoError(t, err)
+			require.NoError(t, writer.WriteTimeValue("", &tt.value))
+			content, err := writer.GetSerializedContent()
+			require.NoError(t, err)
+			assert.Equal(t, tt.want, string(content))
+
+			node, err := NewTextParseNodeFactory().GetRootParseNode("text/plain", content)
+			require.NoError(t, err)
+			parsed, err := node.GetTimeValue()
+			require.NoError(t, err)
+			require.NotNil(t, parsed)
+			assert.True(t, tt.value.Equal(*parsed))
+			_, wantOffset := tt.value.Zone()
+			_, gotOffset := parsed.Zone()
+			assert.Equal(t, wantOffset, gotOffset)
+		})
+	}
+}
+
+func TestWriteTimeValueWithMonotonicClock(t *testing.T) {
+	value := time.Now()
+	writer := NewTextSerializationWriter()
+	require.NoError(t, writer.WriteTimeValue("", &value))
+	content, err := writer.GetSerializedContent()
+	require.NoError(t, err)
+	node, err := NewTextParseNode(content)
+	require.NoError(t, err)
+	parsed, err := node.GetTimeValue()
+	require.NoError(t, err)
+	require.NotNil(t, parsed)
+	assert.True(t, value.Equal(*parsed))
+}
+
+func TestWriteTimeValuePreservesWriterGuards(t *testing.T) {
+	value := time.Date(2026, 10, 16, 12, 34, 56, 0, time.UTC)
+	writer := NewTextSerializationWriter()
+	require.NoError(t, writer.WriteTimeValue("", nil))
+	content, err := writer.GetSerializedContent()
+	require.NoError(t, err)
+	assert.Empty(t, content)
+	assert.ErrorIs(t, writer.WriteTimeValue("nested", &value), NoStructuredDataError)
+	require.NoError(t, writer.WriteTimeValue("", &value))
+	assert.ErrorIs(t, writer.WriteTimeValue("", &value), OnlyOneValue)
+}
 
 func TestItDoesntWriteAnythingForAdditionalData(t *testing.T) {
 	serializer := NewTextSerializationWriter()
