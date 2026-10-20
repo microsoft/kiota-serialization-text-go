@@ -136,10 +136,10 @@ func (n *TextParseNode) GetInt32Value() (*int32, error) {
 	if n == nil {
 		return nil, nil
 	}
-	if parsed, err := strconv.ParseInt(n.value, 0, 32); err == nil {
+	if parsed, err := strconv.ParseInt(n.value, 10, 32); err == nil {
 		cast := int32(parsed)
 		return &cast, nil
-	} else if !errors.Is(err, strconv.ErrSyntax) {
+	} else if !errors.Is(err, strconv.ErrSyntax) && !strings.ContainsAny(n.value, ".eE") {
 		return nil, err
 	}
 	v, err := n.GetFloat64Value()
@@ -158,9 +158,9 @@ func (n *TextParseNode) GetInt64Value() (*int64, error) {
 	if n == nil {
 		return nil, nil
 	}
-	if parsed, err := strconv.ParseInt(n.value, 0, 64); err == nil {
+	if parsed, err := strconv.ParseInt(n.value, 10, 64); err == nil {
 		return &parsed, nil
-	} else if !errors.Is(err, strconv.ErrSyntax) {
+	} else if !errors.Is(err, strconv.ErrSyntax) && !strings.ContainsAny(n.value, ".eE") {
 		return nil, err
 	}
 	v, err := n.GetFloat64Value()

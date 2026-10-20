@@ -92,6 +92,22 @@ func TestGetInt32Value(t *testing.T) {
 		assert.Equal(t, int32(-2147483648), *val)
 	})
 
+	t.Run("parses leading-zero decimal int32", func(t *testing.T) {
+		node, err := NewTextParseNode([]byte("010"))
+		assert.NoError(t, err)
+		val, err := node.GetInt32Value()
+		assert.NoError(t, err)
+		assert.Equal(t, int32(10), *val)
+	})
+
+	t.Run("coerces exponent int32 after integer overflow", func(t *testing.T) {
+		node, err := NewTextParseNode([]byte("100000000000000000000e-20"))
+		assert.NoError(t, err)
+		val, err := node.GetInt32Value()
+		assert.NoError(t, err)
+		assert.Equal(t, int32(1), *val)
+	})
+
 	t.Run("rejects overflow int32", func(t *testing.T) {
 		node, err := NewTextParseNode([]byte("2147483648"))
 		assert.NoError(t, err)
@@ -126,6 +142,22 @@ func TestGetInt64Value(t *testing.T) {
 		assert.Equal(t, int64(-9223372036854775808), *val)
 	})
 
+	t.Run("parses leading-zero decimal int64", func(t *testing.T) {
+		node, err := NewTextParseNode([]byte("010"))
+		assert.NoError(t, err)
+		val, err := node.GetInt64Value()
+		assert.NoError(t, err)
+		assert.Equal(t, int64(10), *val)
+	})
+
+	t.Run("coerces exponent int64 after integer overflow", func(t *testing.T) {
+		node, err := NewTextParseNode([]byte("100000000000000000000e-20"))
+		assert.NoError(t, err)
+		val, err := node.GetInt64Value()
+		assert.NoError(t, err)
+		assert.Equal(t, int64(1), *val)
+	})
+
 	t.Run("rejects overflow int64", func(t *testing.T) {
 		node, err := NewTextParseNode([]byte("9223372036854775808"))
 		assert.NoError(t, err)
@@ -134,4 +166,3 @@ func TestGetInt64Value(t *testing.T) {
 		assert.Nil(t, val)
 	})
 }
-
