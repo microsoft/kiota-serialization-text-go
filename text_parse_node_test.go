@@ -55,6 +55,9 @@ func TestGetByteValue(t *testing.T) {
 			{"128", 128},
 			{"200", 200},
 			{"255", 255},
+			{"+0", 0},
+			{"+127", 127},
+			{"+255", 255},
 		} {
 			node, err := NewTextParseNode([]byte(tc.input))
 			assert.NoError(t, err)
@@ -65,7 +68,7 @@ func TestGetByteValue(t *testing.T) {
 	})
 
 	t.Run("rejects out of range byte values", func(t *testing.T) {
-		for _, input := range []string{"256", "-1", "invalid"} {
+		for _, input := range []string{"256", "+256", "-1", "invalid"} {
 			node, err := NewTextParseNode([]byte(input))
 			assert.NoError(t, err)
 			val, err := node.GetByteValue()

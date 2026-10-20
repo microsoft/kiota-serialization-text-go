@@ -97,7 +97,7 @@ func (n *TextParseNode) GetByteValue() (*byte, error) {
 	if n == nil {
 		return nil, nil
 	}
-	val, err := strconv.ParseUint(n.value, 0, 8)
+	val, err := strconv.ParseUint(strings.TrimPrefix(n.value, "+"), 0, 8)
 	if err != nil {
 		return nil, err
 	}
