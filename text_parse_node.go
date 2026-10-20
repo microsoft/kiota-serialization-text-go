@@ -12,7 +12,7 @@ import (
 	absser "github.com/microsoft/kiota-abstractions-go/serialization"
 )
 
-// TextParseNode is a ParseNode implementation for JSON.
+// TextParseNode is a ParseNode implementation for text.
 type TextParseNode struct {
 	value                     string
 	onBeforeAssignFieldValues absser.ParsableAction
@@ -92,16 +92,16 @@ func (n *TextParseNode) GetInt8Value() (*int8, error) {
 	return &cast, nil
 }
 
-// GetBoolValue returns a Bool value from the nodes.
+// GetByteValue returns a Byte value from the nodes.
 func (n *TextParseNode) GetByteValue() (*byte, error) {
 	if n == nil {
 		return nil, nil
 	}
-	val, err := strconv.ParseInt(n.value, 0, 8)
+	val, err := strconv.ParseUint(strings.TrimPrefix(n.value, "+"), 0, 8)
 	if err != nil {
 		return nil, err
 	}
-	cast := uint8(val)
+	cast := byte(val)
 	return &cast, nil
 }
 
@@ -133,6 +133,15 @@ func (n *TextParseNode) GetFloat64Value() (*float64, error) {
 
 // GetInt32Value returns a Int32 value from the nodes.
 func (n *TextParseNode) GetInt32Value() (*int32, error) {
+	if n == nil {
+		return nil, nil
+	}
+	if parsed, err := strconv.ParseInt(n.value, 10, 32); err == nil {
+		cast := int32(parsed)
+		return &cast, nil
+	} else if !errors.Is(err, strconv.ErrSyntax) && !strings.ContainsAny(n.value, ".eE") {
+		return nil, err
+	}
 	v, err := n.GetFloat64Value()
 	if err != nil {
 		return nil, err
@@ -146,6 +155,14 @@ func (n *TextParseNode) GetInt32Value() (*int32, error) {
 
 // GetInt64Value returns a Int64 value from the nodes.
 func (n *TextParseNode) GetInt64Value() (*int64, error) {
+	if n == nil {
+		return nil, nil
+	}
+	if parsed, err := strconv.ParseInt(n.value, 10, 64); err == nil {
+		return &parsed, nil
+	} else if !errors.Is(err, strconv.ErrSyntax) && !strings.ContainsAny(n.value, ".eE") {
+		return nil, err
+	}
 	v, err := n.GetFloat64Value()
 	if err != nil {
 		return nil, err
