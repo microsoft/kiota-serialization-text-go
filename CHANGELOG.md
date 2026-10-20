@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.5](https://github.com/microsoft/kiota-serialization-text-go/compare/v1.1.4...v1.1.5) (2026-10-20)
+
+
+### Bug Fixes
+
+* **text:** parse byte as unsigned and preserve integer precision for int32/int64 ([2a8641f](https://github.com/microsoft/kiota-serialization-text-go/commit/2a8641f68c76bcd07382c212d270e19ab975dc47))
+* **text:** parse byte as unsigned and preserve integer precision for int32/int64 ([2313caf](https://github.com/microsoft/kiota-serialization-text-go/commit/2313caf290edbef4d56103910a536ab23f7258df))
+* **text:** preserve decimal and exponent parsing ([4447d28](https://github.com/microsoft/kiota-serialization-text-go/commit/4447d28bfa901c0db07d0e3bde47f48e4e8e1fe8))
+* **text:** preserve leading plus byte values ([2837b8e](https://github.com/microsoft/kiota-serialization-text-go/commit/2837b8e1ceea5ed2e7612576d256334c8e0e4fff))
+
 ## [1.1.4](https://github.com/microsoft/kiota-serialization-text-go/compare/v1.1.3...v1.1.4) (2026-10-16)
 
 
