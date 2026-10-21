@@ -184,6 +184,12 @@ func (n *TextParseNode) GetTimeValue() (*time.Time, error) {
 		return nil, nil
 	}
 	parsed, err := time.Parse(time.RFC3339, *v)
+	if err != nil {
+		parsedNano, errNano := time.Parse(time.RFC3339Nano, *v)
+		if errNano == nil {
+			return &parsedNano, nil
+		}
+	}
 	return &parsed, err
 }
 
