@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.6](https://github.com/microsoft/kiota-serialization-text-go/compare/v1.1.5...v1.1.6) (2026-10-23)
+
+
+### Bug Fixes
+
+* **text:** support content-type parameters, trim whitespace, and add nil receiver guards ([95698f8](https://github.com/microsoft/kiota-serialization-text-go/commit/95698f863021d9f7affbf5955051e6025b007af4))
+* **text:** support content-type parameters, trim whitespace, and add nil receiver guards ([0bff70b](https://github.com/microsoft/kiota-serialization-text-go/commit/0bff70b83636fd73ca0719a208a57e566d286713))
+
 ## [1.1.5](https://github.com/microsoft/kiota-serialization-text-go/compare/v1.1.4...v1.1.5) (2026-10-20)
 
 
