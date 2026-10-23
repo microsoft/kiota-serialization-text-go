@@ -111,3 +111,41 @@ func TestTextSerializationWriter(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, serializer.GetOnStartObjectSerialization())
 }
+func TestWriteEmptyStringEnforcesOnlyOneValue(t *testing.T) {
+	writer := NewTextSerializationWriter()
+	empty := ""
+	require.NoError(t, writer.WriteStringValue("", &empty))
+	second := "hello"
+	assert.ErrorIs(t, writer.WriteStringValue("", &second), OnlyOneValue)
+	content, err := writer.GetSerializedContent()
+	require.NoError(t, err)
+	assert.Equal(t, "", string(content))
+}
+
+func TestCloseClearsInternalBuffer(t *testing.T) {
+	writer := NewTextSerializationWriter()
+	val := "hello"
+	require.NoError(t, writer.WriteStringValue("", &val))
+	content, err := writer.GetSerializedContent()
+	require.NoError(t, err)
+	assert.Equal(t, "hello", string(content))
+
+	require.NoError(t, writer.Close())
+	contentAfter, err := writer.GetSerializedContent()
+	require.NoError(t, err)
+	assert.Empty(t, contentAfter)
+
+	nextVal := "world"
+	require.NoError(t, writer.WriteStringValue("", &nextVal))
+	contentNext, err := writer.GetSerializedContent()
+	require.NoError(t, err)
+	assert.Equal(t, "world", string(contentNext))
+}
+
+func TestNilWriterDoesNotPanic(t *testing.T) {
+	var nilWriter *TextSerializationWriter
+	content, err := nilWriter.GetSerializedContent()
+	assert.Error(t, err)
+	assert.Nil(t, content)
+	assert.NoError(t, nilWriter.Close())
+}

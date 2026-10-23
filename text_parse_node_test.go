@@ -169,3 +169,17 @@ func TestGetInt64Value(t *testing.T) {
 		assert.Nil(t, val)
 	})
 }
+func TestGetTimeValueWithSubseconds(t *testing.T) {
+	inputs := []string{
+		"2026-10-21T15:30:00.123456789Z",
+		"2026-10-21T15:30:00.123Z",
+		"2026-10-21T15:30:00.123456+05:30",
+	}
+	for _, input := range inputs {
+		node, err := NewTextParseNode([]byte(input))
+		assert.NoError(t, err)
+		parsed, err := node.GetTimeValue()
+		assert.NoError(t, err)
+		assert.NotNil(t, parsed)
+	}
+}
