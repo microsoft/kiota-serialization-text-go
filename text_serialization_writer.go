@@ -30,6 +30,9 @@ func NewTextSerializationWriter() *TextSerializationWriter {
 	}
 }
 func (w *TextSerializationWriter) writeStringValue(key string, value string) error {
+	if w == nil {
+		return errors.New("writer cannot be nil")
+	}
 	if key != "" {
 		return NoStructuredDataError
 	}
@@ -235,6 +238,9 @@ func (w *TextSerializationWriter) WriteCollectionOfInt8Values(key string, collec
 
 // GetSerializedContent returns the resulting byte array from the serialization writer.
 func (w *TextSerializationWriter) GetSerializedContent() ([]byte, error) {
+	if w == nil {
+		return nil, errors.New("writer cannot be nil")
+	}
 	resultStr := strings.Join(w.writer, "")
 	return []byte(resultStr), nil
 }
@@ -259,28 +265,46 @@ func (w *TextSerializationWriter) WriteNullValue(key string) error {
 }
 
 func (w *TextSerializationWriter) GetOnBeforeSerialization() absser.ParsableAction {
+	if w == nil {
+		return nil
+	}
 	return w.onBeforeAssignFieldValues
 }
 
 func (w *TextSerializationWriter) SetOnBeforeSerialization(action absser.ParsableAction) error {
+	if w == nil {
+		return errors.New("writer cannot be nil")
+	}
 	w.onBeforeAssignFieldValues = action
 	return nil
 }
 
 func (w *TextSerializationWriter) GetOnAfterObjectSerialization() absser.ParsableAction {
+	if w == nil {
+		return nil
+	}
 	return w.onAfterAssignFieldValues
 }
 
 func (w *TextSerializationWriter) SetOnAfterObjectSerialization(action absser.ParsableAction) error {
+	if w == nil {
+		return errors.New("writer cannot be nil")
+	}
 	w.onAfterAssignFieldValues = action
 	return nil
 }
 
 func (w *TextSerializationWriter) GetOnStartObjectSerialization() absser.ParsableWriter {
+	if w == nil {
+		return nil
+	}
 	return w.onStartObjectSerialization
 }
 
 func (w *TextSerializationWriter) SetOnStartObjectSerialization(writer absser.ParsableWriter) error {
+	if w == nil {
+		return errors.New("writer cannot be nil")
+	}
 	w.onStartObjectSerialization = writer
 	return nil
 }
