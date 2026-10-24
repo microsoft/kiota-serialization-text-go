@@ -111,3 +111,20 @@ func TestTextSerializationWriter(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, serializer.GetOnStartObjectSerialization())
 }
+
+func TestNilSerializationWriterMethods(t *testing.T) {
+	var nilWriter *TextSerializationWriter
+	content, err := nilWriter.GetSerializedContent()
+	assert.Error(t, err)
+	assert.Nil(t, content)
+
+	testStr := "hello"
+	assert.Error(t, nilWriter.WriteStringValue("", &testStr))
+
+	assert.Nil(t, nilWriter.GetOnBeforeSerialization())
+	assert.Error(t, nilWriter.SetOnBeforeSerialization(func(p absser.Parsable) error { return nil }))
+	assert.Nil(t, nilWriter.GetOnAfterObjectSerialization())
+	assert.Error(t, nilWriter.SetOnAfterObjectSerialization(func(p absser.Parsable) error { return nil }))
+	assert.Nil(t, nilWriter.GetOnStartObjectSerialization())
+	assert.Error(t, nilWriter.SetOnStartObjectSerialization(func(p absser.Parsable, w absser.SerializationWriter) error { return nil }))
+}

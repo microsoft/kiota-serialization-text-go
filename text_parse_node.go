@@ -265,27 +265,42 @@ func (n *TextParseNode) GetByteArrayValue() ([]byte, error) {
 
 // GetRawValue returns a ByteArray value from the nodes.
 func (n *TextParseNode) GetRawValue() (interface{}, error) {
+	if n == nil {
+		return nil, nil
+	}
 	return n.value, nil
 }
 
 // GetOnBeforeAssignFieldValues returns a ByteArray value from the nodes.
 func (n *TextParseNode) GetOnBeforeAssignFieldValues() absser.ParsableAction {
+	if n == nil {
+		return nil
+	}
 	return n.onBeforeAssignFieldValues
 }
 
 // SetOnBeforeAssignFieldValues returns a ByteArray value from the nodes.
 func (n *TextParseNode) SetOnBeforeAssignFieldValues(action absser.ParsableAction) error {
+	if n == nil {
+		return errors.New("parse node cannot be nil")
+	}
 	n.onBeforeAssignFieldValues = action
 	return nil
 }
 
 // GetOnAfterAssignFieldValues returns a ByteArray value from the nodes.
 func (n *TextParseNode) GetOnAfterAssignFieldValues() absser.ParsableAction {
+	if n == nil {
+		return nil
+	}
 	return n.onAfterAssignFieldValues
 }
 
 // SetOnAfterAssignFieldValues returns a ByteArray value from the nodes.
 func (n *TextParseNode) SetOnAfterAssignFieldValues(action absser.ParsableAction) error {
+	if n == nil {
+		return errors.New("parse node cannot be nil")
+	}
 	n.onAfterAssignFieldValues = action
 	return nil
 }

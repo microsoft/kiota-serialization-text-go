@@ -169,3 +169,15 @@ func TestGetInt64Value(t *testing.T) {
 		assert.Nil(t, val)
 	})
 }
+
+func TestNilParseNodeMethods(t *testing.T) {
+	var nilNode *TextParseNode
+	val, err := nilNode.GetRawValue()
+	assert.NoError(t, err)
+	assert.Nil(t, val)
+
+	assert.Nil(t, nilNode.GetOnBeforeAssignFieldValues())
+	assert.Error(t, nilNode.SetOnBeforeAssignFieldValues(func(p absser.Parsable) error { return nil }))
+	assert.Nil(t, nilNode.GetOnAfterAssignFieldValues())
+	assert.Error(t, nilNode.SetOnAfterAssignFieldValues(func(p absser.Parsable) error { return nil }))
+}
