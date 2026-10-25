@@ -36,12 +36,10 @@ func (w *TextSerializationWriter) writeStringValue(key string, value string) err
 	if key != "" {
 		return NoStructuredDataError
 	}
-	if value != "" {
-		if len(w.writer) > 0 {
-			return OnlyOneValue
-		}
-		w.writer = append(w.writer, value)
+	if len(w.writer) > 0 {
+		return OnlyOneValue
 	}
+	w.writer = append(w.writer, value)
 	return nil
 }
 
@@ -257,6 +255,9 @@ func (w *TextSerializationWriter) WriteAnyValue(key string, value interface{}) e
 
 // Close clears the internal buffer.
 func (w *TextSerializationWriter) Close() error {
+	if w != nil {
+		w.writer = make([]string, 0)
+	}
 	return nil
 }
 
