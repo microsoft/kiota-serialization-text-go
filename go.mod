@@ -1,10 +1,10 @@
 module github.com/microsoft/kiota-serialization-text-go
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/google/uuid v1.6.0
-	github.com/microsoft/kiota-abstractions-go v1.11.1
+	github.com/microsoft/kiota-abstractions-go v1.11.2
 	github.com/stretchr/testify v1.12.1
 )
 
