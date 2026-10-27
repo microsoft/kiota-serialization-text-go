@@ -27,6 +27,8 @@ func NewTextParseNode(content []byte) (*TextParseNode, error) {
 	value, err := loadTextTree(content)
 	return value, err
 }
+// loadTextTree initializes a TextParseNode, stripping enclosing double quotes when the content
+// is wrapped with matching quotes and has length of at least 2.
 func loadTextTree(content []byte) (*TextParseNode, error) {
 	val := string(content)
 	if len(val) >= 2 && strings.HasPrefix(val, "\"") && strings.HasSuffix(val, "\"") {
