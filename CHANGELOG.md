@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.6](https://github.com/microsoft/kiota-serialization-text-go/compare/v1.1.5...v1.1.6) (2026-10-26)
+
+
+### Bug Fixes
+
+* **text:** add nil receiver guards to parse node callbacks, raw value, and serialization writer ([5c6909d](https://github.com/microsoft/kiota-serialization-text-go/commit/5c6909dc78ae045e07cfe3101aa1c817de3c28df))
+* **text:** add nil receiver guards to parse node callbacks, raw value, and serialization writer ([8577ae1](https://github.com/microsoft/kiota-serialization-text-go/commit/8577ae10c45fcd7ce5bd9370e41ef7b0abe4d21e))
+* **text:** support content-type parameters, trim whitespace, and add nil receiver guards ([95698f8](https://github.com/microsoft/kiota-serialization-text-go/commit/95698f863021d9f7affbf5955051e6025b007af4))
+* **text:** support content-type parameters, trim whitespace, and add nil receiver guards ([0bff70b](https://github.com/microsoft/kiota-serialization-text-go/commit/0bff70b83636fd73ca0719a208a57e566d286713))
+* **text:** support RFC3339Nano time parsing, empty string tracking, and writer buffer reset ([6445db8](https://github.com/microsoft/kiota-serialization-text-go/commit/6445db80c738c0c0f0717b79b337ce9e57336bbe))
+* **text:** track empty strings to enforce single value constraint and reset writer on close ([fa785de](https://github.com/microsoft/kiota-serialization-text-go/commit/fa785def573f17ea138204211baef891de14a300))
+
+## [1.1.5](https://github.com/microsoft/kiota-serialization-text-go/compare/v1.1.4...v1.1.5) (2026-10-20)
+
+
+### Bug Fixes
+
+* **text:** parse byte as unsigned and preserve integer precision for int32/int64 ([2a8641f](https://github.com/microsoft/kiota-serialization-text-go/commit/2a8641f68c76bcd07382c212d270e19ab975dc47))
+* **text:** parse byte as unsigned and preserve integer precision for int32/int64 ([2313caf](https://github.com/microsoft/kiota-serialization-text-go/commit/2313caf290edbef4d56103910a536ab23f7258df))
+* **text:** preserve decimal and exponent parsing ([4447d28](https://github.com/microsoft/kiota-serialization-text-go/commit/4447d28bfa901c0db07d0e3bde47f48e4e8e1fe8))
+* **text:** preserve leading plus byte values ([2837b8e](https://github.com/microsoft/kiota-serialization-text-go/commit/2837b8e1ceea5ed2e7612576d256334c8e0e4fff))
+
 ## [1.1.4](https://github.com/microsoft/kiota-serialization-text-go/compare/v1.1.3...v1.1.4) (2026-10-16)
 
 
