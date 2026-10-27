@@ -78,3 +78,30 @@ func TestQuotedScalarsAndSingleQuote(t *testing.T) {
 	assert.Equal(t, "", *emptyQuoteVal)
 }
 
+func TestUnbalancedQuotesAndNumbers(t *testing.T) {
+	// Unbalanced leading quote should not be stripped
+	leadingNode, err := NewTextParseNode([]byte("\"hello"))
+	assert.NoError(t, err)
+	leadingVal, err := leadingNode.GetStringValue()
+	assert.NoError(t, err)
+	assert.NotNil(t, leadingVal)
+	assert.Equal(t, "\"hello", *leadingVal)
+
+	// Unbalanced trailing quote should not be stripped
+	trailingNode, err := NewTextParseNode([]byte("hello\""))
+	assert.NoError(t, err)
+	trailingVal, err := trailingNode.GetStringValue()
+	assert.NoError(t, err)
+	assert.NotNil(t, trailingVal)
+	assert.Equal(t, "hello\"", *trailingVal)
+
+	// Quoted float64
+	floatNode, err := NewTextParseNode([]byte("\"3.14159\""))
+	assert.NoError(t, err)
+	floatVal, err := floatNode.GetFloat64Value()
+	assert.NoError(t, err)
+	assert.NotNil(t, floatVal)
+	assert.Equal(t, 3.14159, *floatVal)
+}
+
+
