@@ -104,7 +104,7 @@ func (n *TextParseNode) GetInt8Value() (*int8, error) {
 	if v == nil {
 		return nil, nil
 	}
-	if *v < -128 || *v > 127 {
+	if !(*v >= -128 && *v <= 127) {
 		return nil, strconv.ErrRange
 	}
 	cast := int8(*v)
@@ -130,7 +130,7 @@ func (n *TextParseNode) GetByteValue() (*byte, error) {
 	if v == nil {
 		return nil, nil
 	}
-	if *v < 0 || *v > 255 {
+	if !(*v >= 0 && *v <= 255) {
 		return nil, strconv.ErrRange
 	}
 	cast := byte(*v)
@@ -180,7 +180,7 @@ func (n *TextParseNode) GetInt32Value() (*int32, error) {
 	if v == nil {
 		return nil, nil
 	}
-	if *v < -2147483648 || *v > 2147483647 {
+	if !(*v >= -2147483648 && *v <= 2147483647) {
 		return nil, strconv.ErrRange
 	}
 	cast := int32(*v)
@@ -204,7 +204,7 @@ func (n *TextParseNode) GetInt64Value() (*int64, error) {
 	if v == nil {
 		return nil, nil
 	}
-	if *v < -9223372036854775808 || *v > 9223372036854775807 {
+	if !(*v >= -9223372036854775808 && *v < 9223372036854775808) {
 		return nil, strconv.ErrRange
 	}
 	cast := int64(*v)

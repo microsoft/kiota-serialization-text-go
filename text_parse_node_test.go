@@ -129,7 +129,7 @@ func TestGetInt8Value(t *testing.T) {
 	})
 
 	t.Run("rejects out of range int8 values", func(t *testing.T) {
-		for _, input := range []string{"128", "-129", "256", "300.0", "-300.0", "invalid"} {
+		for _, input := range []string{"128", "-129", "256", "300.0", "-300.0", "NaN", "invalid"} {
 			node, err := NewTextParseNode([]byte(input))
 			assert.NoError(t, err)
 			val, err := node.GetInt8Value()
@@ -174,7 +174,7 @@ func TestGetByteValue(t *testing.T) {
 	})
 
 	t.Run("rejects out of range byte values", func(t *testing.T) {
-		for _, input := range []string{"256", "+256", "-1", "300.0", "-10.0", "invalid"} {
+		for _, input := range []string{"256", "+256", "-1", "300.0", "-10.0", "NaN", "invalid"} {
 			node, err := NewTextParseNode([]byte(input))
 			assert.NoError(t, err)
 			val, err := node.GetByteValue()
@@ -275,11 +275,13 @@ func TestGetInt32Value(t *testing.T) {
 	})
 
 	t.Run("rejects coerced float overflow int32", func(t *testing.T) {
-		node, err := NewTextParseNode([]byte("3000000000.0"))
-		assert.NoError(t, err)
-		val, err := node.GetInt32Value()
-		assert.Error(t, err)
-		assert.Nil(t, val)
+		for _, input := range []string{"3000000000.0", "-3000000000.0", "NaN"} {
+			node, err := NewTextParseNode([]byte(input))
+			assert.NoError(t, err)
+			val, err := node.GetInt32Value()
+			assert.Error(t, err)
+			assert.Nil(t, val)
+		}
 	})
 
 	t.Run("coerces floating point integer format", func(t *testing.T) {
@@ -333,11 +335,18 @@ func TestGetInt64Value(t *testing.T) {
 	})
 
 	t.Run("rejects coerced float overflow int64", func(t *testing.T) {
-		node, err := NewTextParseNode([]byte("1e25"))
-		assert.NoError(t, err)
-		val, err := node.GetInt64Value()
-		assert.Error(t, err)
-		assert.Nil(t, val)
+		for _, input := range []string{
+			"9223372036854775808.0",
+			"9.223372036854776e18",
+			"1e25",
+			"NaN",
+		} {
+			node, err := NewTextParseNode([]byte(input))
+			assert.NoError(t, err)
+			val, err := node.GetInt64Value()
+			assert.Error(t, err)
+			assert.Nil(t, val)
+		}
 	})
 }
 
