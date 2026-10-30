@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
 	absser "github.com/microsoft/kiota-abstractions-go/serialization"
 	assert "github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -159,4 +160,106 @@ func TestCloseClearsInternalBuffer(t *testing.T) {
 	contentNext, err := writer.GetSerializedContent()
 	require.NoError(t, err)
 	assert.Equal(t, "world", string(contentNext))
+}
+
+func TestWriteScalars(t *testing.T) {
+	t.Run("WriteFloat32Value preserves 32-bit shortest representation", func(t *testing.T) {
+		writer := NewTextSerializationWriter()
+		val := float32(0.1)
+		require.NoError(t, writer.WriteFloat32Value("", &val))
+		content, err := writer.GetSerializedContent()
+		require.NoError(t, err)
+		assert.Equal(t, "0.1", string(content))
+	})
+
+	t.Run("WriteFloat64Value", func(t *testing.T) {
+		writer := NewTextSerializationWriter()
+		val := 3.14159
+		require.NoError(t, writer.WriteFloat64Value("", &val))
+		content, err := writer.GetSerializedContent()
+		require.NoError(t, err)
+		assert.Equal(t, "3.14159", string(content))
+	})
+
+	t.Run("WriteBoolValue", func(t *testing.T) {
+		writer := NewTextSerializationWriter()
+		val := true
+		require.NoError(t, writer.WriteBoolValue("", &val))
+		content, err := writer.GetSerializedContent()
+		require.NoError(t, err)
+		assert.Equal(t, "true", string(content))
+	})
+
+	t.Run("WriteByteValue", func(t *testing.T) {
+		writer := NewTextSerializationWriter()
+		val := byte(255)
+		require.NoError(t, writer.WriteByteValue("", &val))
+		content, err := writer.GetSerializedContent()
+		require.NoError(t, err)
+		assert.Equal(t, "255", string(content))
+	})
+
+	t.Run("WriteInt8Value", func(t *testing.T) {
+		writer := NewTextSerializationWriter()
+		val := int8(-128)
+		require.NoError(t, writer.WriteInt8Value("", &val))
+		content, err := writer.GetSerializedContent()
+		require.NoError(t, err)
+		assert.Equal(t, "-128", string(content))
+	})
+
+	t.Run("WriteInt32Value", func(t *testing.T) {
+		writer := NewTextSerializationWriter()
+		val := int32(42)
+		require.NoError(t, writer.WriteInt32Value("", &val))
+		content, err := writer.GetSerializedContent()
+		require.NoError(t, err)
+		assert.Equal(t, "42", string(content))
+	})
+
+	t.Run("WriteInt64Value", func(t *testing.T) {
+		writer := NewTextSerializationWriter()
+		val := int64(9223372036854775807)
+		require.NoError(t, writer.WriteInt64Value("", &val))
+		content, err := writer.GetSerializedContent()
+		require.NoError(t, err)
+		assert.Equal(t, "9223372036854775807", string(content))
+	})
+
+	t.Run("WriteUUIDValue", func(t *testing.T) {
+		writer := NewTextSerializationWriter()
+		parsed := uuid.MustParse("6ec0bd7f-11c0-43da-975e-2a8ad9ebae0b")
+		require.NoError(t, writer.WriteUUIDValue("", &parsed))
+		content, err := writer.GetSerializedContent()
+		require.NoError(t, err)
+		assert.Equal(t, "6ec0bd7f-11c0-43da-975e-2a8ad9ebae0b", string(content))
+	})
+
+	t.Run("WriteByteArrayValue", func(t *testing.T) {
+		writer := NewTextSerializationWriter()
+		bytes := []byte("hello world")
+		require.NoError(t, writer.WriteByteArrayValue("", bytes))
+		content, err := writer.GetSerializedContent()
+		require.NoError(t, err)
+		assert.Equal(t, "aGVsbG8gd29ybGQ=", string(content))
+	})
+
+	t.Run("nil values write nothing and return no error", func(t *testing.T) {
+		writer := NewTextSerializationWriter()
+		require.NoError(t, writer.WriteBoolValue("", nil))
+		require.NoError(t, writer.WriteByteValue("", nil))
+		require.NoError(t, writer.WriteInt8Value("", nil))
+		require.NoError(t, writer.WriteInt32Value("", nil))
+		require.NoError(t, writer.WriteInt64Value("", nil))
+		require.NoError(t, writer.WriteFloat32Value("", nil))
+		require.NoError(t, writer.WriteFloat64Value("", nil))
+		require.NoError(t, writer.WriteUUIDValue("", nil))
+		require.NoError(t, writer.WriteByteArrayValue("", nil))
+		require.NoError(t, writer.WriteISODurationValue("", nil))
+		require.NoError(t, writer.WriteTimeOnlyValue("", nil))
+		require.NoError(t, writer.WriteDateOnlyValue("", nil))
+		content, err := writer.GetSerializedContent()
+		require.NoError(t, err)
+		assert.Empty(t, content)
+	})
 }
