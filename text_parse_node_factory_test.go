@@ -38,6 +38,18 @@ func TestTextParseNodeFactoryGetRootParseNode(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, node)
 
+	node, err = factory.GetRootParseNode("\"text/plain\"", []byte("hello"))
+	assert.NoError(t, err)
+	assert.NotNil(t, node)
+
+	node, err = factory.GetRootParseNode("\"text/plain\"; charset=utf-8", []byte("hello"))
+	assert.NoError(t, err)
+	assert.NotNil(t, node)
+
+	node, err = factory.GetRootParseNode("\"TEXT/PLAIN\"", []byte("hello"))
+	assert.NoError(t, err)
+	assert.NotNil(t, node)
+
 	_, err = factory.GetRootParseNode("", []byte("hello"))
 	assert.Error(t, err)
 

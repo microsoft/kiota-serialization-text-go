@@ -38,6 +38,18 @@ func TestTextSerializationWriterFactoryGetSerializationWriter(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, writer)
 
+	writer, err = factory.GetSerializationWriter("\"text/plain\"")
+	assert.NoError(t, err)
+	assert.NotNil(t, writer)
+
+	writer, err = factory.GetSerializationWriter("\"text/plain\"; charset=utf-8")
+	assert.NoError(t, err)
+	assert.NotNil(t, writer)
+
+	writer, err = factory.GetSerializationWriter("\"TEXT/PLAIN\"")
+	assert.NoError(t, err)
+	assert.NotNil(t, writer)
+
 	_, err = factory.GetSerializationWriter("")
 	assert.Error(t, err)
 
