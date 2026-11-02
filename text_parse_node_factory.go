@@ -39,7 +39,8 @@ func (f *TextParseNodeFactory) GetRootParseNode(contentType string, content []by
 	}
 
 	mediaType, _, _ := strings.Cut(trimmed, ";")
-	if strings.ToLower(strings.TrimSpace(mediaType)) != validType {
+	mediaType = strings.Trim(strings.TrimSpace(mediaType), "\"")
+	if !strings.EqualFold(mediaType, validType) {
 		return nil, errors.New("contentType is not valid")
 	}
 

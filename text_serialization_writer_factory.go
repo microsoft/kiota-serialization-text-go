@@ -39,7 +39,8 @@ func (f *TextSerializationWriterFactory) GetSerializationWriter(contentType stri
 	}
 
 	mediaType, _, _ := strings.Cut(trimmed, ";")
-	if strings.ToLower(strings.TrimSpace(mediaType)) != validType {
+	mediaType = strings.Trim(strings.TrimSpace(mediaType), "\"")
+	if !strings.EqualFold(mediaType, validType) {
 		return nil, errors.New("contentType is not valid")
 	}
 
