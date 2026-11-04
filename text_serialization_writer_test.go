@@ -160,3 +160,88 @@ func TestCloseClearsInternalBuffer(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "world", string(contentNext))
 }
+
+func TestNilSerializationWriter_CollectionAndObjectMethods(t *testing.T) {
+	var nilWriter *TextSerializationWriter
+	expectedErr := "writer cannot be nil"
+
+	err := nilWriter.WriteObjectValue("", nil)
+	assert.EqualError(t, err, expectedErr)
+
+	err = nilWriter.WriteCollectionOfObjectValues("", nil)
+	assert.EqualError(t, err, expectedErr)
+
+	err = nilWriter.WriteCollectionOfStringValues("", nil)
+	assert.EqualError(t, err, expectedErr)
+
+	err = nilWriter.WriteCollectionOfInt32Values("", nil)
+	assert.EqualError(t, err, expectedErr)
+
+	err = nilWriter.WriteCollectionOfInt64Values("", nil)
+	assert.EqualError(t, err, expectedErr)
+
+	err = nilWriter.WriteCollectionOfFloat32Values("", nil)
+	assert.EqualError(t, err, expectedErr)
+
+	err = nilWriter.WriteCollectionOfFloat64Values("", nil)
+	assert.EqualError(t, err, expectedErr)
+
+	err = nilWriter.WriteCollectionOfTimeValues("", nil)
+	assert.EqualError(t, err, expectedErr)
+
+	err = nilWriter.WriteCollectionOfISODurationValues("", nil)
+	assert.EqualError(t, err, expectedErr)
+
+	err = nilWriter.WriteCollectionOfTimeOnlyValues("", nil)
+	assert.EqualError(t, err, expectedErr)
+
+	err = nilWriter.WriteCollectionOfDateOnlyValues("", nil)
+	assert.EqualError(t, err, expectedErr)
+
+	err = nilWriter.WriteCollectionOfUUIDValues("", nil)
+	assert.EqualError(t, err, expectedErr)
+
+	err = nilWriter.WriteCollectionOfBoolValues("", nil)
+	assert.EqualError(t, err, expectedErr)
+
+	err = nilWriter.WriteCollectionOfByteValues("", nil)
+	assert.EqualError(t, err, expectedErr)
+
+	err = nilWriter.WriteCollectionOfInt8Values("", nil)
+	assert.EqualError(t, err, expectedErr)
+
+	err = nilWriter.WriteAdditionalData(nil)
+	assert.EqualError(t, err, expectedErr)
+
+	err = nilWriter.WriteNullValue("")
+	assert.EqualError(t, err, expectedErr)
+
+	err = nilWriter.WriteAnyValue("", nil)
+	assert.EqualError(t, err, expectedErr)
+}
+
+func TestWriteAnyValue_TypedNilSafety(t *testing.T) {
+	writer := NewTextSerializationWriter()
+
+	var pStr *string = nil
+	require.NoError(t, writer.WriteAnyValue("", pStr))
+
+	var pInt *int32 = nil
+	require.NoError(t, writer.WriteAnyValue("", pInt))
+
+	var pSlice []string = nil
+	require.NoError(t, writer.WriteAnyValue("", pSlice))
+
+	var pMap map[string]string = nil
+	require.NoError(t, writer.WriteAnyValue("", pMap))
+
+	require.NoError(t, writer.WriteAnyValue("", nil))
+
+	// Verify buffer remains empty
+	content, err := writer.GetSerializedContent()
+	require.NoError(t, err)
+	assert.Empty(t, content)
+
+	// Non-nil unknown value returns NoStructuredDataError
+	assert.ErrorIs(t, writer.WriteAnyValue("", "hello"), NoStructuredDataError)
+}
