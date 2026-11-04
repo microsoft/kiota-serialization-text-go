@@ -78,7 +78,11 @@ func (n *TextParseNode) GetBoolValue() (*bool, error) {
 	if n == nil {
 		return nil, nil
 	}
-	val, err := strconv.ParseBool(n.value)
+	trimmed := strings.TrimSpace(n.value)
+	if trimmed == "" {
+		return nil, nil
+	}
+	val, err := strconv.ParseBool(trimmed)
 	if err != nil {
 		return nil, err
 	}
@@ -202,7 +206,11 @@ func (n *TextParseNode) GetISODurationValue() (*absser.ISODuration, error) {
 	if v == nil {
 		return nil, nil
 	}
-	return absser.ParseISODuration(*v)
+	trimmed := strings.TrimSpace(*v)
+	if trimmed == "" {
+		return nil, nil
+	}
+	return absser.ParseISODuration(trimmed)
 }
 
 // GetTimeOnlyValue returns a TimeOnly value from the nodes.
@@ -214,7 +222,11 @@ func (n *TextParseNode) GetTimeOnlyValue() (*absser.TimeOnly, error) {
 	if v == nil {
 		return nil, nil
 	}
-	return absser.ParseTimeOnly(*v)
+	trimmed := strings.TrimSpace(*v)
+	if trimmed == "" {
+		return nil, nil
+	}
+	return absser.ParseTimeOnly(trimmed)
 }
 
 // GetDateOnlyValue returns a DateOnly value from the nodes.
@@ -226,7 +238,11 @@ func (n *TextParseNode) GetDateOnlyValue() (*absser.DateOnly, error) {
 	if v == nil {
 		return nil, nil
 	}
-	return absser.ParseDateOnly(*v)
+	trimmed := strings.TrimSpace(*v)
+	if trimmed == "" {
+		return nil, nil
+	}
+	return absser.ParseDateOnly(trimmed)
 }
 
 // GetUUIDValue returns a UUID value from the nodes.
@@ -254,7 +270,11 @@ func (n *TextParseNode) GetEnumValue(parser absser.EnumFactory) (interface{}, er
 	if s == nil {
 		return nil, nil
 	}
-	return parser(*s)
+	trimmed := strings.TrimSpace(*s)
+	if trimmed == "" {
+		return nil, nil
+	}
+	return parser(trimmed)
 }
 
 // GetByteArrayValue returns a ByteArray value from the nodes.
