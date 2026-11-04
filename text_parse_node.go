@@ -78,7 +78,7 @@ func (n *TextParseNode) GetBoolValue() (*bool, error) {
 	if n == nil {
 		return nil, nil
 	}
-	trimmed := strings.TrimSpace(n.value)
+	trimmed := strings.Trim(strings.TrimSpace(n.value), "\"")
 	if trimmed == "" {
 		return nil, nil
 	}
@@ -206,7 +206,7 @@ func (n *TextParseNode) GetISODurationValue() (*absser.ISODuration, error) {
 	if v == nil {
 		return nil, nil
 	}
-	trimmed := strings.TrimSpace(*v)
+	trimmed := strings.Trim(strings.TrimSpace(*v), "\"")
 	if trimmed == "" {
 		return nil, nil
 	}
@@ -222,7 +222,7 @@ func (n *TextParseNode) GetTimeOnlyValue() (*absser.TimeOnly, error) {
 	if v == nil {
 		return nil, nil
 	}
-	trimmed := strings.TrimSpace(*v)
+	trimmed := strings.Trim(strings.TrimSpace(*v), "\"")
 	if trimmed == "" {
 		return nil, nil
 	}
@@ -238,7 +238,7 @@ func (n *TextParseNode) GetDateOnlyValue() (*absser.DateOnly, error) {
 	if v == nil {
 		return nil, nil
 	}
-	trimmed := strings.TrimSpace(*v)
+	trimmed := strings.Trim(strings.TrimSpace(*v), "\"")
 	if trimmed == "" {
 		return nil, nil
 	}
@@ -270,7 +270,7 @@ func (n *TextParseNode) GetEnumValue(parser absser.EnumFactory) (interface{}, er
 	if s == nil {
 		return nil, nil
 	}
-	trimmed := strings.TrimSpace(*s)
+	trimmed := strings.Trim(strings.TrimSpace(*s), "\"")
 	if trimmed == "" {
 		return nil, nil
 	}

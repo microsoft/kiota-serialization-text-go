@@ -1,6 +1,7 @@
 package textserialization
 
 import (
+	"errors"
 	testing "testing"
 
 	absser "github.com/microsoft/kiota-abstractions-go/serialization"
@@ -256,4 +257,120 @@ func TestGetTimeValueWithSubseconds(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, parsed)
 	}
+}
+
+type testStatus int
+
+const (
+	testStatusActive testStatus = iota
+	testStatusInactive
+)
+
+func testStatusFactory(value string) (interface{}, error) {
+	switch value {
+	case "active":
+		return testStatusActive, nil
+	case "inactive":
+		return testStatusInactive, nil
+	default:
+		return nil, errors.New("unknown status: " + value)
+	}
+}
+
+func TestGetBoolValue_WhitespaceAndNewlines(t *testing.T) {
+	for _, tc := range []struct {
+		input    string
+		expected bool
+	}{
+		{"true\n", true},
+		{"false\r\n", false},
+		{" true ", true},
+		{"\tfalse\t", false},
+		{"1\n", true},
+		{"0\r\n", false},
+		{"\"true\"\n", true},
+	} {
+		node, err := NewTextParseNode([]byte(tc.input))
+		assert.NoError(t, err)
+		val, err := node.GetBoolValue()
+		assert.NoError(t, err)
+		assert.NotNil(t, val)
+		assert.Equal(t, tc.expected, *val)
+	}
+
+	// Whitespace only returns (nil, nil)
+	emptyNode, err := NewTextParseNode([]byte("   \n\t  "))
+	assert.NoError(t, err)
+	val, err := emptyNode.GetBoolValue()
+	assert.NoError(t, err)
+	assert.Nil(t, val)
+}
+
+func TestGetDateOnlyValue_WhitespaceAndNewlines(t *testing.T) {
+	for _, input := range []string{
+		"2026-10-21\n",
+		" 2026-10-21\r\n",
+		"\t2026-10-21\t",
+	} {
+		node, err := NewTextParseNode([]byte(input))
+		assert.NoError(t, err)
+		dateVal, err := node.GetDateOnlyValue()
+		assert.NoError(t, err)
+		assert.NotNil(t, dateVal)
+		assert.Equal(t, "2026-10-21", dateVal.String())
+	}
+
+	emptyNode, err := NewTextParseNode([]byte("   "))
+	assert.NoError(t, err)
+	val, err := emptyNode.GetDateOnlyValue()
+	assert.NoError(t, err)
+	assert.Nil(t, val)
+}
+
+func TestGetTimeOnlyAndISODuration_WhitespaceAndNewlines(t *testing.T) {
+	nodeTime, err := NewTextParseNode([]byte(" 15:30:00\n "))
+	assert.NoError(t, err)
+	toVal, err := nodeTime.GetTimeOnlyValue()
+	assert.NoError(t, err)
+	assert.NotNil(t, toVal)
+	assert.Equal(t, "15:30:00", toVal.String())
+
+	emptyTime, err := NewTextParseNode([]byte("   \n "))
+	assert.NoError(t, err)
+	emptyTo, err := emptyTime.GetTimeOnlyValue()
+	assert.NoError(t, err)
+	assert.Nil(t, emptyTo)
+
+	nodeDur, err := NewTextParseNode([]byte(" PT1H\r\n "))
+	assert.NoError(t, err)
+	durVal, err := nodeDur.GetISODurationValue()
+	assert.NoError(t, err)
+	assert.NotNil(t, durVal)
+	assert.Equal(t, "PT1H", durVal.String())
+
+	emptyDur, err := NewTextParseNode([]byte("   "))
+	assert.NoError(t, err)
+	emptyDurVal, err := emptyDur.GetISODurationValue()
+	assert.NoError(t, err)
+	assert.Nil(t, emptyDurVal)
+}
+
+func TestGetEnumValue_WhitespaceAndNewlines(t *testing.T) {
+	nodeActive, err := NewTextParseNode([]byte(" active\n "))
+	assert.NoError(t, err)
+	enumVal, err := nodeActive.GetEnumValue(testStatusFactory)
+	assert.NoError(t, err)
+	assert.Equal(t, testStatusActive, enumVal)
+
+	nodeInactive, err := NewTextParseNode([]byte("inactive\r\n"))
+	assert.NoError(t, err)
+	enumVal, err = nodeInactive.GetEnumValue(testStatusFactory)
+	assert.NoError(t, err)
+	assert.Equal(t, testStatusInactive, enumVal)
+
+	emptyNode, err := NewTextParseNode([]byte("   "))
+	assert.NoError(t, err)
+	val, err := emptyNode.GetEnumValue(testStatusFactory)
+	assert.NoError(t, err)
+	assert.Nil(t, val)
 }
