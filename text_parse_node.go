@@ -74,7 +74,11 @@ func (n *TextParseNode) GetStringValue() (*string, error) {
 }
 
 func sanitizeTextValue(v string) string {
-	return strings.TrimSpace(strings.Trim(strings.TrimSpace(v), "\""))
+	trimmed := strings.TrimSpace(v)
+	if len(trimmed) >= 2 && strings.HasPrefix(trimmed, "\"") && strings.HasSuffix(trimmed, "\"") {
+		return strings.TrimSpace(trimmed[1 : len(trimmed)-1])
+	}
+	return trimmed
 }
 
 // GetBoolValue returns a Bool value from the nodes.

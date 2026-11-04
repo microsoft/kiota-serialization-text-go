@@ -315,6 +315,15 @@ func TestGetBoolValue_WhitespaceAndNewlines(t *testing.T) {
 	val, err = quotedEmptyNode.GetBoolValue()
 	assert.NoError(t, err)
 	assert.Nil(t, val)
+
+	// Unmatched quotes return error
+	for _, invalid := range []string{"\"true", "true\"", "\"false", "false\"", "\""} {
+		node, err := NewTextParseNode([]byte(invalid))
+		assert.NoError(t, err)
+		v, err := node.GetBoolValue()
+		assert.Error(t, err)
+		assert.Nil(t, v)
+	}
 }
 
 func TestGetDateOnlyValue_WhitespaceAndNewlines(t *testing.T) {
@@ -484,5 +493,53 @@ func TestGetByteArrayValue_WhitespaceAndEncodings(t *testing.T) {
 	invalidNode, err := NewTextParseNode([]byte("!!invalid!!"))
 	assert.NoError(t, err)
 	_, err = invalidNode.GetByteArrayValue()
+	assert.Error(t, err)
+
+	// Unmatched quotes return error
+	for _, invalid := range []string{"\"SGVsbG8=", "SGVsbG8=\""} {
+		node, err := NewTextParseNode([]byte(invalid))
+		assert.NoError(t, err)
+		_, err = node.GetByteArrayValue()
+		assert.Error(t, err)
+	}
+}
+
+func TestSanitizeTextValue_UnmatchedQuotes(t *testing.T) {
+	// Unmatched quotes are not stripped and cause parsing errors
+	timeNode, err := NewTextParseNode([]byte("\"15:30:00"))
+	assert.NoError(t, err)
+	_, err = timeNode.GetTimeOnlyValue()
+	assert.Error(t, err)
+
+	timeNodeTrailing, err := NewTextParseNode([]byte("15:30:00\""))
+	assert.NoError(t, err)
+	_, err = timeNodeTrailing.GetTimeOnlyValue()
+	assert.Error(t, err)
+
+	dateNode, err := NewTextParseNode([]byte("\"2026-10-21"))
+	assert.NoError(t, err)
+	_, err = dateNode.GetDateOnlyValue()
+	assert.Error(t, err)
+
+	dateNodeTrailing, err := NewTextParseNode([]byte("2026-10-21\""))
+	assert.NoError(t, err)
+	_, err = dateNodeTrailing.GetDateOnlyValue()
+	assert.Error(t, err)
+
+	durNode, err := NewTextParseNode([]byte("\"PT1H\""))
+	assert.NoError(t, err)
+	durVal, err := durNode.GetISODurationValue()
+	assert.NoError(t, err)
+	assert.NotNil(t, durVal)
+	assert.Equal(t, "PT1H", durVal.String())
+
+	enumNode, err := NewTextParseNode([]byte("\"active"))
+	assert.NoError(t, err)
+	_, err = enumNode.GetEnumValue(testStatusFactory)
+	assert.Error(t, err)
+
+	enumNodeTrailing, err := NewTextParseNode([]byte("active\""))
+	assert.NoError(t, err)
+	_, err = enumNodeTrailing.GetEnumValue(testStatusFactory)
 	assert.Error(t, err)
 }
