@@ -374,3 +374,46 @@ func TestGetEnumValue_WhitespaceAndNewlines(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Nil(t, val)
 }
+
+func TestGetByteArrayValue_WhitespaceAndEncodings(t *testing.T) {
+	expected := []byte("Hello world")
+
+	for _, input := range []string{
+		"SGVsbG8gd29ybGQ=",
+		"  SGVsbG8gd29ybGQ= \n",
+		"\"SGVsbG8gd29ybGQ=\"\r\n",
+		"SGVsbG8gd29ybGQ",
+	} {
+		node, err := NewTextParseNode([]byte(input))
+		assert.NoError(t, err)
+		data, err := node.GetByteArrayValue()
+		assert.NoError(t, err)
+		assert.Equal(t, expected, data)
+	}
+
+	// URL-safe encoded binary data
+	urlPaddedNode, err := NewTextParseNode([]byte("-_=="))
+	assert.NoError(t, err)
+	data, err := urlPaddedNode.GetByteArrayValue()
+	assert.NoError(t, err)
+	assert.Equal(t, []byte{251}, data)
+
+	urlRawNode, err := NewTextParseNode([]byte("-_"))
+	assert.NoError(t, err)
+	data, err = urlRawNode.GetByteArrayValue()
+	assert.NoError(t, err)
+	assert.Equal(t, []byte{251}, data)
+
+	// Whitespace only returns (nil, nil)
+	emptyNode, err := NewTextParseNode([]byte("   \n "))
+	assert.NoError(t, err)
+	emptyData, err := emptyNode.GetByteArrayValue()
+	assert.NoError(t, err)
+	assert.Nil(t, emptyData)
+
+	// Invalid base64 returns error
+	invalidNode, err := NewTextParseNode([]byte("!!invalid!!"))
+	assert.NoError(t, err)
+	_, err = invalidNode.GetByteArrayValue()
+	assert.Error(t, err)
+}
