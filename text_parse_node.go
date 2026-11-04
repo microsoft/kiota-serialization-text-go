@@ -286,7 +286,20 @@ func (n *TextParseNode) GetByteArrayValue() ([]byte, error) {
 	if s == nil {
 		return nil, nil
 	}
-	return base64.StdEncoding.DecodeString(*s)
+	trimmed := strings.Trim(strings.TrimSpace(*s), "\"")
+	if trimmed == "" {
+		return nil, nil
+	}
+	if data, err := base64.StdEncoding.DecodeString(trimmed); err == nil {
+		return data, nil
+	}
+	if data, err := base64.RawStdEncoding.DecodeString(trimmed); err == nil {
+		return data, nil
+	}
+	if data, err := base64.URLEncoding.DecodeString(trimmed); err == nil {
+		return data, nil
+	}
+	return base64.RawURLEncoding.DecodeString(trimmed)
 }
 
 // GetRawValue returns a ByteArray value from the nodes.
