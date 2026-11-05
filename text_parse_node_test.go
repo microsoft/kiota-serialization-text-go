@@ -269,3 +269,24 @@ func TestGetStringValue_WithUTF8BOM(t *testing.T) {
 	assert.Equal(t, "Hello World", *val)
 }
 
+func TestQuotedString_WithUTF8BOM(t *testing.T) {
+	node, err := NewTextParseNode([]byte("\xef\xbb\xbf\"Hello World\""))
+	assert.NoError(t, err)
+	assert.NotNil(t, node)
+
+	val, err := node.GetStringValue()
+	assert.NoError(t, err)
+	assert.NotNil(t, val)
+	assert.Equal(t, "Hello World", *val)
+
+	emptyQuotedNode, err := NewTextParseNode([]byte("\xef\xbb\xbf\"\""))
+	assert.NoError(t, err)
+	assert.NotNil(t, emptyQuotedNode)
+
+	emptyVal, err := emptyQuotedNode.GetStringValue()
+	assert.NoError(t, err)
+	assert.NotNil(t, emptyVal)
+	assert.Equal(t, "", *emptyVal)
+}
+
+
