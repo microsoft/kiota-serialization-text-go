@@ -3,6 +3,7 @@ package textserialization
 import (
 	testing "testing"
 
+	"github.com/google/uuid"
 	absser "github.com/microsoft/kiota-abstractions-go/serialization"
 	assert "github.com/stretchr/testify/assert"
 )
@@ -360,6 +361,17 @@ func TestGetFloatValues_WithUTF8BOM(t *testing.T) {
 	assert.NotNil(t, val64)
 	assert.Equal(t, 2.718281828459, *val64)
 }
+
+func TestGetUUIDValue_WithUTF8BOM(t *testing.T) {
+	node, err := NewTextParseNode([]byte("\xef\xbb\xbf6ec0bd7f-11c0-43da-975e-2a8ad9ebae0b"))
+	assert.NoError(t, err)
+	val, err := node.GetUUIDValue()
+	assert.NoError(t, err)
+	assert.NotNil(t, val)
+	expected := uuid.MustParse("6ec0bd7f-11c0-43da-975e-2a8ad9ebae0b")
+	assert.Equal(t, expected, *val)
+}
+
 
 
 
