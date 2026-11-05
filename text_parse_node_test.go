@@ -296,5 +296,25 @@ func TestEmptyContent_OnlyUTF8BOM(t *testing.T) {
 	assert.EqualError(t, err, "content is empty")
 }
 
+func TestGetBoolValue_WithUTF8BOM(t *testing.T) {
+	for _, tc := range []struct {
+		input    string
+		expected bool
+	}{
+		{"\xef\xbb\xbftrue", true},
+		{"\xef\xbb\xbffalse", false},
+		{"\xef\xbb\xbf1", true},
+		{"\xef\xbb\xbf0", false},
+	} {
+		node, err := NewTextParseNode([]byte(tc.input))
+		assert.NoError(t, err)
+		val, err := node.GetBoolValue()
+		assert.NoError(t, err)
+		assert.NotNil(t, val)
+		assert.Equal(t, tc.expected, *val)
+	}
+}
+
+
 
 
