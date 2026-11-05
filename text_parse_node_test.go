@@ -372,6 +372,37 @@ func TestGetUUIDValue_WithUTF8BOM(t *testing.T) {
 	assert.Equal(t, expected, *val)
 }
 
+func TestGetTemporalValues_WithUTF8BOM(t *testing.T) {
+	timeNode, err := NewTextParseNode([]byte("\xef\xbb\xbf2026-10-21T15:30:00Z"))
+	assert.NoError(t, err)
+	timeVal, err := timeNode.GetTimeValue()
+	assert.NoError(t, err)
+	assert.NotNil(t, timeVal)
+	assert.Equal(t, 2026, timeVal.Year())
+
+	dateNode, err := NewTextParseNode([]byte("\xef\xbb\xbf2026-10-21"))
+	assert.NoError(t, err)
+	dateVal, err := dateNode.GetDateOnlyValue()
+	assert.NoError(t, err)
+	assert.NotNil(t, dateVal)
+	assert.Equal(t, "2026-10-21", dateVal.String())
+
+	timeOnlyNode, err := NewTextParseNode([]byte("\xef\xbb\xbf15:30:00"))
+	assert.NoError(t, err)
+	timeOnlyVal, err := timeOnlyNode.GetTimeOnlyValue()
+	assert.NoError(t, err)
+	assert.NotNil(t, timeOnlyVal)
+	assert.Equal(t, "15:30:00", timeOnlyVal.String())
+
+	durationNode, err := NewTextParseNode([]byte("\xef\xbb\xbfP1D"))
+	assert.NoError(t, err)
+	durationVal, err := durationNode.GetISODurationValue()
+	assert.NoError(t, err)
+	assert.NotNil(t, durationVal)
+	assert.Equal(t, "P1D", durationVal.String())
+}
+
+
 
 
 
