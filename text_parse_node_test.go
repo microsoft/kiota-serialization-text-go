@@ -257,3 +257,15 @@ func TestGetTimeValueWithSubseconds(t *testing.T) {
 		assert.NotNil(t, parsed)
 	}
 }
+
+func TestGetStringValue_WithUTF8BOM(t *testing.T) {
+	node, err := NewTextParseNode([]byte("\xef\xbb\xbfHello World"))
+	assert.NoError(t, err)
+	assert.NotNil(t, node)
+
+	val, err := node.GetStringValue()
+	assert.NoError(t, err)
+	assert.NotNil(t, val)
+	assert.Equal(t, "Hello World", *val)
+}
+
