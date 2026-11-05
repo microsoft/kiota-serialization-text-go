@@ -315,6 +315,37 @@ func TestGetBoolValue_WithUTF8BOM(t *testing.T) {
 	}
 }
 
+func TestGetIntegerValues_WithUTF8BOM(t *testing.T) {
+	node32, err := NewTextParseNode([]byte("\xef\xbb\xbf42"))
+	assert.NoError(t, err)
+	val32, err := node32.GetInt32Value()
+	assert.NoError(t, err)
+	assert.NotNil(t, val32)
+	assert.Equal(t, int32(42), *val32)
+
+	node64, err := NewTextParseNode([]byte("\xef\xbb\xbf9223372036854775807"))
+	assert.NoError(t, err)
+	val64, err := node64.GetInt64Value()
+	assert.NoError(t, err)
+	assert.NotNil(t, val64)
+	assert.Equal(t, int64(9223372036854775807), *val64)
+
+	node8, err := NewTextParseNode([]byte("\xef\xbb\xbf-128"))
+	assert.NoError(t, err)
+	val8, err := node8.GetInt8Value()
+	assert.NoError(t, err)
+	assert.NotNil(t, val8)
+	assert.Equal(t, int8(-128), *val8)
+
+	nodeByte, err := NewTextParseNode([]byte("\xef\xbb\xbf255"))
+	assert.NoError(t, err)
+	valByte, err := nodeByte.GetByteValue()
+	assert.NoError(t, err)
+	assert.NotNil(t, valByte)
+	assert.Equal(t, byte(255), *valByte)
+}
+
+
 
 
 
