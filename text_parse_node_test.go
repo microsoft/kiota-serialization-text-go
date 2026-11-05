@@ -289,4 +289,12 @@ func TestQuotedString_WithUTF8BOM(t *testing.T) {
 	assert.Equal(t, "", *emptyVal)
 }
 
+func TestEmptyContent_OnlyUTF8BOM(t *testing.T) {
+	node, err := NewTextParseNode([]byte{0xef, 0xbb, 0xbf})
+	assert.Error(t, err)
+	assert.Nil(t, node)
+	assert.EqualError(t, err, "content is empty")
+}
+
+
 
