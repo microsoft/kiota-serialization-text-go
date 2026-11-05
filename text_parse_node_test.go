@@ -363,12 +363,18 @@ func TestGetDateOnlyValue_WhitespaceAndNewlines(t *testing.T) {
 }
 
 func TestGetTimeOnlyAndISODuration_WhitespaceAndNewlines(t *testing.T) {
-	nodeTime, err := NewTextParseNode([]byte(" 15:30:00\n "))
-	assert.NoError(t, err)
-	toVal, err := nodeTime.GetTimeOnlyValue()
-	assert.NoError(t, err)
-	assert.NotNil(t, toVal)
-	assert.Equal(t, "15:30:00", toVal.String())
+	for _, input := range []string{
+		" 15:30:00\n ",
+		"15:30:00\r\n",
+		"\t15:30:00\t",
+	} {
+		nodeTime, err := NewTextParseNode([]byte(input))
+		assert.NoError(t, err)
+		toVal, err := nodeTime.GetTimeOnlyValue()
+		assert.NoError(t, err)
+		assert.NotNil(t, toVal)
+		assert.Equal(t, "15:30:00", toVal.String())
+	}
 
 	emptyTime, err := NewTextParseNode([]byte("   \n "))
 	assert.NoError(t, err)
@@ -390,12 +396,18 @@ func TestGetTimeOnlyAndISODuration_WhitespaceAndNewlines(t *testing.T) {
 		assert.Nil(t, v)
 	}
 
-	nodeDur, err := NewTextParseNode([]byte(" PT1H\r\n "))
-	assert.NoError(t, err)
-	durVal, err := nodeDur.GetISODurationValue()
-	assert.NoError(t, err)
-	assert.NotNil(t, durVal)
-	assert.Equal(t, "PT1H", durVal.String())
+	for _, input := range []string{
+		" PT1H\r\n ",
+		"PT1H\n",
+		"\tPT1H\t",
+	} {
+		nodeDur, err := NewTextParseNode([]byte(input))
+		assert.NoError(t, err)
+		durVal, err := nodeDur.GetISODurationValue()
+		assert.NoError(t, err)
+		assert.NotNil(t, durVal)
+		assert.Equal(t, "PT1H", durVal.String())
+	}
 
 	emptyDur, err := NewTextParseNode([]byte("   "))
 	assert.NoError(t, err)
