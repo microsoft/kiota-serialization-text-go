@@ -20,7 +20,8 @@ type TextParseNode struct {
 	onAfterAssignFieldValues  absser.ParsableAction
 }
 
-// NewTextParseNode creates a new TextParseNode.
+// NewTextParseNode creates a new TextParseNode. If present, a leading UTF-8 byte order mark (BOM)
+// is stripped prior to initializing the node.
 func NewTextParseNode(content []byte) (*TextParseNode, error) {
 	content = bytes.TrimPrefix(content, []byte("\xef\xbb\xbf"))
 	if len(content) == 0 {
