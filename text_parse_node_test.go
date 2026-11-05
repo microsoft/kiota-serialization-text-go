@@ -496,28 +496,30 @@ func TestGetByteArrayValue_WhitespaceAndEncodings(t *testing.T) {
 }
 
 func TestScalarParsers_RejectQuotedValues(t *testing.T) {
-	for _, invalid := range []string{"\"15:30:00", "15:30:00\"", " \"15:30:00\" "} {
+	// Plain text serialization format does not strip enclosing quotes per maintainer guidance.
+	// Quoted strings are treated as invalid syntax for scalar types (bool, temporal, enum, etc.).
+	for _, invalid := range []string{"\"15:30:00", "15:30:00\"", " \"15:30:00\" ", "\"15:30:00\"\n"} {
 		node, err := NewTextParseNode([]byte(invalid))
 		assert.NoError(t, err)
 		_, err = node.GetTimeOnlyValue()
 		assert.Error(t, err)
 	}
 
-	for _, invalid := range []string{"\"2026-10-21", "2026-10-21\"", " \"2026-10-21\" "} {
+	for _, invalid := range []string{"\"2026-10-21", "2026-10-21\"", " \"2026-10-21\" ", "\"2026-10-21\"\r\n"} {
 		node, err := NewTextParseNode([]byte(invalid))
 		assert.NoError(t, err)
 		_, err = node.GetDateOnlyValue()
 		assert.Error(t, err)
 	}
 
-	for _, invalid := range []string{"\"active", "active\"", " \"active\" "} {
+	for _, invalid := range []string{"\"active", "active\"", " \"active\" ", "\"active\"\n"} {
 		node, err := NewTextParseNode([]byte(invalid))
 		assert.NoError(t, err)
 		_, err = node.GetEnumValue(testStatusFactory)
 		assert.Error(t, err)
 	}
 
-	for _, invalid := range []string{"\"true", "true\"", " \"true\" "} {
+	for _, invalid := range []string{"\"true", "true\"", " \"true\" ", "\"true\"\n", "\"false\"\r\n", " \" true \"\n"} {
 		node, err := NewTextParseNode([]byte(invalid))
 		assert.NoError(t, err)
 		_, err = node.GetBoolValue()
