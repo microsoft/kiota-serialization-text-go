@@ -345,6 +345,23 @@ func TestGetIntegerValues_WithUTF8BOM(t *testing.T) {
 	assert.Equal(t, byte(255), *valByte)
 }
 
+func TestGetFloatValues_WithUTF8BOM(t *testing.T) {
+	node32, err := NewTextParseNode([]byte("\xef\xbb\xbf3.14"))
+	assert.NoError(t, err)
+	val32, err := node32.GetFloat32Value()
+	assert.NoError(t, err)
+	assert.NotNil(t, val32)
+	assert.Equal(t, float32(3.14), *val32)
+
+	node64, err := NewTextParseNode([]byte("\xef\xbb\xbf2.718281828459"))
+	assert.NoError(t, err)
+	val64, err := node64.GetFloat64Value()
+	assert.NoError(t, err)
+	assert.NotNil(t, val64)
+	assert.Equal(t, 2.718281828459, *val64)
+}
+
+
 
 
 
