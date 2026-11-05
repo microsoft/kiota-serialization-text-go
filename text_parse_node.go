@@ -73,7 +73,8 @@ func (n *TextParseNode) GetStringValue() (*string, error) {
 	return &val, nil
 }
 
-// GetBoolValue returns a Bool value from the nodes.
+// GetBoolValue returns a Bool value from the nodes. Leading and trailing whitespace
+// and newlines are trimmed. Quoted values are preserved as-is and rejected as invalid syntax.
 func (n *TextParseNode) GetBoolValue() (*bool, error) {
 	if n == nil {
 		return nil, nil
@@ -277,7 +278,8 @@ func (n *TextParseNode) GetEnumValue(parser absser.EnumFactory) (interface{}, er
 	return parser(trimmed)
 }
 
-// GetByteArrayValue returns a ByteArray value from the nodes.
+// GetByteArrayValue returns a ByteArray value from the nodes. Leading and trailing whitespace
+// and newlines are trimmed. Quoted values are preserved as-is and rejected as invalid syntax.
 func (n *TextParseNode) GetByteArrayValue() ([]byte, error) {
 	s, err := n.GetStringValue()
 	if err != nil {
