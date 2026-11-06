@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.7](https://github.com/microsoft/kiota-serialization-text-go/compare/v1.1.6...v1.1.7) (2026-10-27)
+
+
+### Bug Fixes
+
+* **text:** normalize enclosing quotes during parse node initialization ([30c6259](https://github.com/microsoft/kiota-serialization-text-go/commit/30c6259c4ac77ee107403170b9cc625f762d9fac))
+* **text:** normalize enclosing quotes in loadTextTree for TextParseNode ([a3d4112](https://github.com/microsoft/kiota-serialization-text-go/commit/a3d4112311d2a802ff375b65a4313c9a7584d7d3))
+
 ## [1.1.6](https://github.com/microsoft/kiota-serialization-text-go/compare/v1.1.5...v1.1.6) (2026-10-26)
 
 
