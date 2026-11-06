@@ -15,6 +15,7 @@ import (
 
 var NoStructuredDataError = errors.New("text does not support structured data")
 var OnlyOneValue = errors.New("text serialization writer can only write one value")
+var NilWriterError = errors.New("writer cannot be nil")
 
 // TextSerializationWriter implements SerializationWriter for JSON.
 type TextSerializationWriter struct {
@@ -32,7 +33,7 @@ func NewTextSerializationWriter() *TextSerializationWriter {
 }
 func (w *TextSerializationWriter) writeStringValue(key string, value string) error {
 	if w == nil {
-		return errors.New("writer cannot be nil")
+		return NilWriterError
 	}
 	if key != "" {
 		return NoStructuredDataError
@@ -176,7 +177,7 @@ func isNil(val any) bool {
 // WriteObjectValue writes a Parsable value to underlying the byte array.
 func (w *TextSerializationWriter) WriteObjectValue(key string, item absser.Parsable, additionalValuesToMerge ...absser.Parsable) error {
 	if w == nil {
-		return errors.New("writer cannot be nil")
+		return NilWriterError
 	}
 	return NoStructuredDataError
 }
@@ -184,7 +185,7 @@ func (w *TextSerializationWriter) WriteObjectValue(key string, item absser.Parsa
 // WriteCollectionOfObjectValues writes a collection of Parsable values to underlying the byte array.
 func (w *TextSerializationWriter) WriteCollectionOfObjectValues(key string, collection []absser.Parsable) error {
 	if w == nil {
-		return errors.New("writer cannot be nil")
+		return NilWriterError
 	}
 	return NoStructuredDataError
 }
@@ -192,7 +193,7 @@ func (w *TextSerializationWriter) WriteCollectionOfObjectValues(key string, coll
 // WriteCollectionOfStringValues writes a collection of String values to underlying the byte array.
 func (w *TextSerializationWriter) WriteCollectionOfStringValues(key string, collection []string) error {
 	if w == nil {
-		return errors.New("writer cannot be nil")
+		return NilWriterError
 	}
 	return NoStructuredDataError
 }
@@ -200,7 +201,7 @@ func (w *TextSerializationWriter) WriteCollectionOfStringValues(key string, coll
 // WriteCollectionOfInt32Values writes a collection of Int32 values to underlying the byte array.
 func (w *TextSerializationWriter) WriteCollectionOfInt32Values(key string, collection []int32) error {
 	if w == nil {
-		return errors.New("writer cannot be nil")
+		return NilWriterError
 	}
 	return NoStructuredDataError
 }
@@ -208,7 +209,7 @@ func (w *TextSerializationWriter) WriteCollectionOfInt32Values(key string, colle
 // WriteCollectionOfInt64Values writes a collection of Int64 values to underlying the byte array.
 func (w *TextSerializationWriter) WriteCollectionOfInt64Values(key string, collection []int64) error {
 	if w == nil {
-		return errors.New("writer cannot be nil")
+		return NilWriterError
 	}
 	return NoStructuredDataError
 }
@@ -216,7 +217,7 @@ func (w *TextSerializationWriter) WriteCollectionOfInt64Values(key string, colle
 // WriteCollectionOfFloat32Values writes a collection of Float32 values to underlying the byte array.
 func (w *TextSerializationWriter) WriteCollectionOfFloat32Values(key string, collection []float32) error {
 	if w == nil {
-		return errors.New("writer cannot be nil")
+		return NilWriterError
 	}
 	return NoStructuredDataError
 }
@@ -224,7 +225,7 @@ func (w *TextSerializationWriter) WriteCollectionOfFloat32Values(key string, col
 // WriteCollectionOfFloat64Values writes a collection of Float64 values to underlying the byte array.
 func (w *TextSerializationWriter) WriteCollectionOfFloat64Values(key string, collection []float64) error {
 	if w == nil {
-		return errors.New("writer cannot be nil")
+		return NilWriterError
 	}
 	return NoStructuredDataError
 }
@@ -232,7 +233,7 @@ func (w *TextSerializationWriter) WriteCollectionOfFloat64Values(key string, col
 // WriteCollectionOfTimeValues writes a collection of Time values to underlying the byte array.
 func (w *TextSerializationWriter) WriteCollectionOfTimeValues(key string, collection []time.Time) error {
 	if w == nil {
-		return errors.New("writer cannot be nil")
+		return NilWriterError
 	}
 	return NoStructuredDataError
 }
@@ -240,7 +241,7 @@ func (w *TextSerializationWriter) WriteCollectionOfTimeValues(key string, collec
 // WriteCollectionOfISODurationValues writes a collection of ISODuration values to underlying the byte array.
 func (w *TextSerializationWriter) WriteCollectionOfISODurationValues(key string, collection []absser.ISODuration) error {
 	if w == nil {
-		return errors.New("writer cannot be nil")
+		return NilWriterError
 	}
 	return NoStructuredDataError
 }
@@ -248,7 +249,7 @@ func (w *TextSerializationWriter) WriteCollectionOfISODurationValues(key string,
 // WriteCollectionOfTimeOnlyValues writes a collection of TimeOnly values to underlying the byte array.
 func (w *TextSerializationWriter) WriteCollectionOfTimeOnlyValues(key string, collection []absser.TimeOnly) error {
 	if w == nil {
-		return errors.New("writer cannot be nil")
+		return NilWriterError
 	}
 	return NoStructuredDataError
 }
@@ -256,7 +257,7 @@ func (w *TextSerializationWriter) WriteCollectionOfTimeOnlyValues(key string, co
 // WriteCollectionOfDateOnlyValues writes a collection of DateOnly values to underlying the byte array.
 func (w *TextSerializationWriter) WriteCollectionOfDateOnlyValues(key string, collection []absser.DateOnly) error {
 	if w == nil {
-		return errors.New("writer cannot be nil")
+		return NilWriterError
 	}
 	return NoStructuredDataError
 }
@@ -264,7 +265,7 @@ func (w *TextSerializationWriter) WriteCollectionOfDateOnlyValues(key string, co
 // WriteCollectionOfUUIDValues writes a collection of UUID values to underlying the byte array.
 func (w *TextSerializationWriter) WriteCollectionOfUUIDValues(key string, collection []uuid.UUID) error {
 	if w == nil {
-		return errors.New("writer cannot be nil")
+		return NilWriterError
 	}
 	return NoStructuredDataError
 }
@@ -272,7 +273,7 @@ func (w *TextSerializationWriter) WriteCollectionOfUUIDValues(key string, collec
 // WriteCollectionOfBoolValues writes a collection of Bool values to underlying the byte array.
 func (w *TextSerializationWriter) WriteCollectionOfBoolValues(key string, collection []bool) error {
 	if w == nil {
-		return errors.New("writer cannot be nil")
+		return NilWriterError
 	}
 	return NoStructuredDataError
 }
@@ -280,7 +281,7 @@ func (w *TextSerializationWriter) WriteCollectionOfBoolValues(key string, collec
 // WriteCollectionOfByteValues writes a collection of Byte values to underlying the byte array.
 func (w *TextSerializationWriter) WriteCollectionOfByteValues(key string, collection []byte) error {
 	if w == nil {
-		return errors.New("writer cannot be nil")
+		return NilWriterError
 	}
 	return NoStructuredDataError
 }
@@ -288,7 +289,7 @@ func (w *TextSerializationWriter) WriteCollectionOfByteValues(key string, collec
 // WriteCollectionOfInt8Values writes a collection of int8 values to underlying the byte array.
 func (w *TextSerializationWriter) WriteCollectionOfInt8Values(key string, collection []int8) error {
 	if w == nil {
-		return errors.New("writer cannot be nil")
+		return NilWriterError
 	}
 	return NoStructuredDataError
 }
@@ -296,7 +297,7 @@ func (w *TextSerializationWriter) WriteCollectionOfInt8Values(key string, collec
 // GetSerializedContent returns the resulting byte array from the serialization writer.
 func (w *TextSerializationWriter) GetSerializedContent() ([]byte, error) {
 	if w == nil {
-		return nil, errors.New("writer cannot be nil")
+		return nil, NilWriterError
 	}
 	resultStr := strings.Join(w.writer, "")
 	return []byte(resultStr), nil
@@ -305,7 +306,7 @@ func (w *TextSerializationWriter) GetSerializedContent() ([]byte, error) {
 // WriteAdditionalData writes additional data to underlying the byte array.
 func (w *TextSerializationWriter) WriteAdditionalData(value map[string]interface{}) error {
 	if w == nil {
-		return errors.New("writer cannot be nil")
+		return NilWriterError
 	}
 	return NoStructuredDataError
 }
@@ -313,7 +314,7 @@ func (w *TextSerializationWriter) WriteAdditionalData(value map[string]interface
 // WriteAnyValue an unknown value as a parameter.
 func (w *TextSerializationWriter) WriteAnyValue(key string, value interface{}) error {
 	if w == nil {
-		return errors.New("writer cannot be nil")
+		return NilWriterError
 	}
 	if isNil(value) {
 		return nil
@@ -331,7 +332,7 @@ func (w *TextSerializationWriter) Close() error {
 
 func (w *TextSerializationWriter) WriteNullValue(key string) error {
 	if w == nil {
-		return errors.New("writer cannot be nil")
+		return NilWriterError
 	}
 	return NoStructuredDataError
 }
@@ -345,7 +346,7 @@ func (w *TextSerializationWriter) GetOnBeforeSerialization() absser.ParsableActi
 
 func (w *TextSerializationWriter) SetOnBeforeSerialization(action absser.ParsableAction) error {
 	if w == nil {
-		return errors.New("writer cannot be nil")
+		return NilWriterError
 	}
 	w.onBeforeAssignFieldValues = action
 	return nil
@@ -360,7 +361,7 @@ func (w *TextSerializationWriter) GetOnAfterObjectSerialization() absser.Parsabl
 
 func (w *TextSerializationWriter) SetOnAfterObjectSerialization(action absser.ParsableAction) error {
 	if w == nil {
-		return errors.New("writer cannot be nil")
+		return NilWriterError
 	}
 	w.onAfterAssignFieldValues = action
 	return nil
@@ -375,7 +376,7 @@ func (w *TextSerializationWriter) GetOnStartObjectSerialization() absser.Parsabl
 
 func (w *TextSerializationWriter) SetOnStartObjectSerialization(writer absser.ParsableWriter) error {
 	if w == nil {
-		return errors.New("writer cannot be nil")
+		return NilWriterError
 	}
 	w.onStartObjectSerialization = writer
 	return nil

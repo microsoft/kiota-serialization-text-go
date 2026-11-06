@@ -115,18 +115,18 @@ func TestTextSerializationWriter(t *testing.T) {
 func TestNilSerializationWriterMethods(t *testing.T) {
 	var nilWriter *TextSerializationWriter
 	content, err := nilWriter.GetSerializedContent()
-	assert.Error(t, err)
+	assert.ErrorIs(t, err, NilWriterError)
 	assert.Nil(t, content)
 
 	testStr := "hello"
-	assert.Error(t, nilWriter.WriteStringValue("", &testStr))
+	assert.ErrorIs(t, nilWriter.WriteStringValue("", &testStr), NilWriterError)
 
 	assert.Nil(t, nilWriter.GetOnBeforeSerialization())
-	assert.Error(t, nilWriter.SetOnBeforeSerialization(func(p absser.Parsable) error { return nil }))
+	assert.ErrorIs(t, nilWriter.SetOnBeforeSerialization(func(p absser.Parsable) error { return nil }), NilWriterError)
 	assert.Nil(t, nilWriter.GetOnAfterObjectSerialization())
-	assert.Error(t, nilWriter.SetOnAfterObjectSerialization(func(p absser.Parsable) error { return nil }))
+	assert.ErrorIs(t, nilWriter.SetOnAfterObjectSerialization(func(p absser.Parsable) error { return nil }), NilWriterError)
 	assert.Nil(t, nilWriter.GetOnStartObjectSerialization())
-	assert.Error(t, nilWriter.SetOnStartObjectSerialization(func(p absser.Parsable, w absser.SerializationWriter) error { return nil }))
+	assert.ErrorIs(t, nilWriter.SetOnStartObjectSerialization(func(p absser.Parsable, w absser.SerializationWriter) error { return nil }), NilWriterError)
 	assert.NoError(t, nilWriter.Close())
 }
 
@@ -163,61 +163,25 @@ func TestCloseClearsInternalBuffer(t *testing.T) {
 
 func TestNilSerializationWriter_CollectionAndObjectMethods(t *testing.T) {
 	var nilWriter *TextSerializationWriter
-	expectedErr := "writer cannot be nil"
 
-	err := nilWriter.WriteObjectValue("", nil)
-	assert.EqualError(t, err, expectedErr)
-
-	err = nilWriter.WriteCollectionOfObjectValues("", nil)
-	assert.EqualError(t, err, expectedErr)
-
-	err = nilWriter.WriteCollectionOfStringValues("", nil)
-	assert.EqualError(t, err, expectedErr)
-
-	err = nilWriter.WriteCollectionOfInt32Values("", nil)
-	assert.EqualError(t, err, expectedErr)
-
-	err = nilWriter.WriteCollectionOfInt64Values("", nil)
-	assert.EqualError(t, err, expectedErr)
-
-	err = nilWriter.WriteCollectionOfFloat32Values("", nil)
-	assert.EqualError(t, err, expectedErr)
-
-	err = nilWriter.WriteCollectionOfFloat64Values("", nil)
-	assert.EqualError(t, err, expectedErr)
-
-	err = nilWriter.WriteCollectionOfTimeValues("", nil)
-	assert.EqualError(t, err, expectedErr)
-
-	err = nilWriter.WriteCollectionOfISODurationValues("", nil)
-	assert.EqualError(t, err, expectedErr)
-
-	err = nilWriter.WriteCollectionOfTimeOnlyValues("", nil)
-	assert.EqualError(t, err, expectedErr)
-
-	err = nilWriter.WriteCollectionOfDateOnlyValues("", nil)
-	assert.EqualError(t, err, expectedErr)
-
-	err = nilWriter.WriteCollectionOfUUIDValues("", nil)
-	assert.EqualError(t, err, expectedErr)
-
-	err = nilWriter.WriteCollectionOfBoolValues("", nil)
-	assert.EqualError(t, err, expectedErr)
-
-	err = nilWriter.WriteCollectionOfByteValues("", nil)
-	assert.EqualError(t, err, expectedErr)
-
-	err = nilWriter.WriteCollectionOfInt8Values("", nil)
-	assert.EqualError(t, err, expectedErr)
-
-	err = nilWriter.WriteAdditionalData(nil)
-	assert.EqualError(t, err, expectedErr)
-
-	err = nilWriter.WriteNullValue("")
-	assert.EqualError(t, err, expectedErr)
-
-	err = nilWriter.WriteAnyValue("", nil)
-	assert.EqualError(t, err, expectedErr)
+	assert.ErrorIs(t, nilWriter.WriteObjectValue("", nil), NilWriterError)
+	assert.ErrorIs(t, nilWriter.WriteCollectionOfObjectValues("", nil), NilWriterError)
+	assert.ErrorIs(t, nilWriter.WriteCollectionOfStringValues("", nil), NilWriterError)
+	assert.ErrorIs(t, nilWriter.WriteCollectionOfInt32Values("", nil), NilWriterError)
+	assert.ErrorIs(t, nilWriter.WriteCollectionOfInt64Values("", nil), NilWriterError)
+	assert.ErrorIs(t, nilWriter.WriteCollectionOfFloat32Values("", nil), NilWriterError)
+	assert.ErrorIs(t, nilWriter.WriteCollectionOfFloat64Values("", nil), NilWriterError)
+	assert.ErrorIs(t, nilWriter.WriteCollectionOfTimeValues("", nil), NilWriterError)
+	assert.ErrorIs(t, nilWriter.WriteCollectionOfISODurationValues("", nil), NilWriterError)
+	assert.ErrorIs(t, nilWriter.WriteCollectionOfTimeOnlyValues("", nil), NilWriterError)
+	assert.ErrorIs(t, nilWriter.WriteCollectionOfDateOnlyValues("", nil), NilWriterError)
+	assert.ErrorIs(t, nilWriter.WriteCollectionOfUUIDValues("", nil), NilWriterError)
+	assert.ErrorIs(t, nilWriter.WriteCollectionOfBoolValues("", nil), NilWriterError)
+	assert.ErrorIs(t, nilWriter.WriteCollectionOfByteValues("", nil), NilWriterError)
+	assert.ErrorIs(t, nilWriter.WriteCollectionOfInt8Values("", nil), NilWriterError)
+	assert.ErrorIs(t, nilWriter.WriteAdditionalData(nil), NilWriterError)
+	assert.ErrorIs(t, nilWriter.WriteNullValue(""), NilWriterError)
+	assert.ErrorIs(t, nilWriter.WriteAnyValue("", nil), NilWriterError)
 }
 
 func TestWriteAnyValue_TypedNilSafety(t *testing.T) {
