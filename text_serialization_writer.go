@@ -97,8 +97,7 @@ func (w *TextSerializationWriter) WriteInt64Value(key string, value *int64) erro
 // WriteFloat32Value writes a Float32 value to underlying the byte array.
 func (w *TextSerializationWriter) WriteFloat32Value(key string, value *float32) error {
 	if value != nil {
-		cast := float64(*value)
-		return w.WriteFloat64Value(key, &cast)
+		return w.writeStringValue(key, strconv.FormatFloat(float64(*value), 'f', -1, 32))
 	}
 	return nil
 }

@@ -104,6 +104,47 @@ func TestUnbalancedQuotesAndNumbers(t *testing.T) {
 	assert.Equal(t, 3.14159, *floatVal)
 }
 
+func TestGetInt8Value(t *testing.T) {
+	t.Run("parses valid int8 values", func(t *testing.T) {
+		for _, tc := range []struct {
+			input    string
+			expected int8
+		}{
+			{"0", 0},
+			{"127", 127},
+			{"-128", -128},
+			{"+0", 0},
+			{"+127", 127},
+			{"010", 10},
+			{"08", 8},
+			{"09", 9},
+			{"42.0", 42},
+		} {
+			node, err := NewTextParseNode([]byte(tc.input))
+			assert.NoError(t, err)
+			val, err := node.GetInt8Value()
+			assert.NoError(t, err)
+			assert.Equal(t, tc.expected, *val)
+		}
+	})
+
+	t.Run("rejects out of range int8 values", func(t *testing.T) {
+		for _, input := range []string{"128", "-129", "256", "300.0", "-300.0", "NaN", "invalid"} {
+			node, err := NewTextParseNode([]byte(input))
+			assert.NoError(t, err)
+			val, err := node.GetInt8Value()
+			assert.Error(t, err)
+			assert.Nil(t, val)
+		}
+	})
+
+	t.Run("nil receiver", func(t *testing.T) {
+		var nilNode *TextParseNode
+		val, err := nilNode.GetInt8Value()
+		assert.NoError(t, err)
+		assert.Nil(t, val)
+	})
+}
 
 func TestGetByteValue(t *testing.T) {
 	t.Run("parses valid unsigned byte values", func(t *testing.T) {
@@ -119,6 +160,10 @@ func TestGetByteValue(t *testing.T) {
 			{"+0", 0},
 			{"+127", 127},
 			{"+255", 255},
+			{"010", 10},
+			{"08", 8},
+			{"09", 9},
+			{"42.0", 42},
 		} {
 			node, err := NewTextParseNode([]byte(tc.input))
 			assert.NoError(t, err)
@@ -129,13 +174,62 @@ func TestGetByteValue(t *testing.T) {
 	})
 
 	t.Run("rejects out of range byte values", func(t *testing.T) {
-		for _, input := range []string{"256", "+256", "-1", "invalid"} {
+		for _, input := range []string{"256", "+256", "-1", "300.0", "-10.0", "NaN", "invalid"} {
 			node, err := NewTextParseNode([]byte(input))
 			assert.NoError(t, err)
 			val, err := node.GetByteValue()
 			assert.Error(t, err)
 			assert.Nil(t, val)
 		}
+	})
+
+	t.Run("nil receiver", func(t *testing.T) {
+		var nilNode *TextParseNode
+		val, err := nilNode.GetByteValue()
+		assert.NoError(t, err)
+		assert.Nil(t, val)
+	})
+}
+
+func TestGetFloat32Value(t *testing.T) {
+	t.Run("parses valid float32", func(t *testing.T) {
+		node, err := NewTextParseNode([]byte("3.14159"))
+		assert.NoError(t, err)
+		val, err := node.GetFloat32Value()
+		assert.NoError(t, err)
+		assert.InDelta(t, float32(3.14159), *val, 0.0001)
+	})
+
+	t.Run("rejects overflow float32", func(t *testing.T) {
+		node, err := NewTextParseNode([]byte("1e50"))
+		assert.NoError(t, err)
+		val, err := node.GetFloat32Value()
+		assert.Error(t, err)
+		assert.Nil(t, val)
+	})
+
+	t.Run("nil receiver", func(t *testing.T) {
+		var nilNode *TextParseNode
+		val, err := nilNode.GetFloat32Value()
+		assert.NoError(t, err)
+		assert.Nil(t, val)
+	})
+}
+
+func TestGetFloat64Value(t *testing.T) {
+	t.Run("parses valid float64", func(t *testing.T) {
+		node, err := NewTextParseNode([]byte("1.7976931348623157e+308"))
+		assert.NoError(t, err)
+		val, err := node.GetFloat64Value()
+		assert.NoError(t, err)
+		assert.NotNil(t, val)
+	})
+
+	t.Run("nil receiver", func(t *testing.T) {
+		var nilNode *TextParseNode
+		val, err := nilNode.GetFloat64Value()
+		assert.NoError(t, err)
+		assert.Nil(t, val)
 	})
 }
 
@@ -178,6 +272,16 @@ func TestGetInt32Value(t *testing.T) {
 		val, err := node.GetInt32Value()
 		assert.Error(t, err)
 		assert.Nil(t, val)
+	})
+
+	t.Run("rejects coerced float overflow int32", func(t *testing.T) {
+		for _, input := range []string{"3000000000.0", "-3000000000.0", "NaN"} {
+			node, err := NewTextParseNode([]byte(input))
+			assert.NoError(t, err)
+			val, err := node.GetInt32Value()
+			assert.Error(t, err)
+			assert.Nil(t, val)
+		}
 	})
 
 	t.Run("coerces floating point integer format", func(t *testing.T) {
@@ -229,6 +333,21 @@ func TestGetInt64Value(t *testing.T) {
 		assert.Error(t, err)
 		assert.Nil(t, val)
 	})
+
+	t.Run("rejects coerced float overflow int64", func(t *testing.T) {
+		for _, input := range []string{
+			"9223372036854775808.0",
+			"9.223372036854776e18",
+			"1e25",
+			"NaN",
+		} {
+			node, err := NewTextParseNode([]byte(input))
+			assert.NoError(t, err)
+			val, err := node.GetInt64Value()
+			assert.Error(t, err)
+			assert.Nil(t, val)
+		}
+	})
 }
 
 func TestNilParseNodeMethods(t *testing.T) {
@@ -256,4 +375,30 @@ func TestGetTimeValueWithSubseconds(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, parsed)
 	}
+}
+
+func TestGetTimeValueInvalidReturnsNil(t *testing.T) {
+	node, err := NewTextParseNode([]byte("invalid-time"))
+	assert.NoError(t, err)
+	parsed, err := node.GetTimeValue()
+	assert.Error(t, err)
+	assert.Nil(t, parsed)
+
+	var nilNode *TextParseNode
+	parsedNil, err := nilNode.GetTimeValue()
+	assert.NoError(t, err)
+	assert.Nil(t, parsedNil)
+}
+
+func TestGetUUIDValueInvalidReturnsNil(t *testing.T) {
+	node, err := NewTextParseNode([]byte("invalid-uuid"))
+	assert.NoError(t, err)
+	parsed, err := node.GetUUIDValue()
+	assert.Error(t, err)
+	assert.Nil(t, parsed)
+
+	var nilNode *TextParseNode
+	parsedNil, err := nilNode.GetUUIDValue()
+	assert.NoError(t, err)
+	assert.Nil(t, parsedNil)
 }
