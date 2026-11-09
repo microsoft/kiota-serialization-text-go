@@ -51,3 +51,21 @@ func TestTextParseNodeFactoryGetRootParseNode(t *testing.T) {
 	_, err = nilFactory.GetRootParseNode("text/plain", []byte("hello"))
 	assert.Error(t, err)
 }
+
+func TestTextParseNodeFactoryGetRootParseNode_WithUTF8BOM(t *testing.T) {
+	factory := NewTextParseNodeFactory()
+
+	node, err := factory.GetRootParseNode("text/plain", []byte("\xef\xbb\xbfhello"))
+	assert.NoError(t, err)
+	assert.NotNil(t, node)
+
+	val, err := node.GetStringValue()
+	assert.NoError(t, err)
+	assert.NotNil(t, val)
+	assert.Equal(t, "hello", *val)
+
+	_, err = factory.GetRootParseNode("text/plain", []byte{0xef, 0xbb, 0xbf})
+	assert.Error(t, err)
+	assert.EqualError(t, err, "content is empty")
+}
+
