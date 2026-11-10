@@ -327,6 +327,36 @@ func TestGetInt64Value(t *testing.T) {
 		assert.Equal(t, int64(1), *val)
 	})
 
+	t.Run("parses MaxInt64 in decimal and exponent formats", func(t *testing.T) {
+		for _, input := range []string{
+			"9223372036854775807.0",
+			"9223372036854775807e0",
+			"9.223372036854775807e18",
+		} {
+			node, err := NewTextParseNode([]byte(input))
+			assert.NoError(t, err)
+			val, err := node.GetInt64Value()
+			assert.NoError(t, err)
+			assert.NotNil(t, val)
+			assert.Equal(t, int64(9223372036854775807), *val)
+		}
+	})
+
+	t.Run("parses MinInt64 in decimal and exponent formats", func(t *testing.T) {
+		for _, input := range []string{
+			"-9223372036854775808.0",
+			"-9223372036854775808e0",
+			"-9.223372036854775808e18",
+		} {
+			node, err := NewTextParseNode([]byte(input))
+			assert.NoError(t, err)
+			val, err := node.GetInt64Value()
+			assert.NoError(t, err)
+			assert.NotNil(t, val)
+			assert.Equal(t, int64(-9223372036854775808), *val)
+		}
+	})
+
 	t.Run("rejects overflow int64", func(t *testing.T) {
 		node, err := NewTextParseNode([]byte("9223372036854775808"))
 		assert.NoError(t, err)
@@ -338,7 +368,12 @@ func TestGetInt64Value(t *testing.T) {
 	t.Run("rejects coerced float overflow int64", func(t *testing.T) {
 		for _, input := range []string{
 			"9223372036854775808.0",
+			"9223372036854775808e0",
+			"9.223372036854775808e18",
 			"9.223372036854776e18",
+			"-9223372036854775809.0",
+			"-9223372036854775809e0",
+			"-9.223372036854775809e18",
 			"1e25",
 			"NaN",
 		} {

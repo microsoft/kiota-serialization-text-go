@@ -5,12 +5,19 @@ import (
 	"bytes"
 	"encoding/base64"
 	"errors"
+	"math"
+	"math/big"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/google/uuid"
 	absser "github.com/microsoft/kiota-abstractions-go/serialization"
+)
+
+var (
+	minInt64BigFloat = new(big.Float).SetPrec(128).SetInt64(math.MinInt64)
+	maxInt64BigFloat = new(big.Float).SetPrec(128).SetInt64(math.MaxInt64)
 )
 
 // TextParseNode is a ParseNode implementation for text.
@@ -200,17 +207,17 @@ func (n *TextParseNode) GetInt64Value() (*int64, error) {
 	} else if !errors.Is(err, strconv.ErrSyntax) && !strings.ContainsAny(n.value, ".eE") {
 		return nil, err
 	}
-	v, err := n.GetFloat64Value()
+	bf, _, err := new(big.Float).SetPrec(128).Parse(n.value, 10)
 	if err != nil {
 		return nil, err
 	}
-	if v == nil {
-		return nil, nil
-	}
-	if !(*v >= -9223372036854775808 && *v < 9223372036854775808) {
+	if bf.IsInf() {
 		return nil, strconv.ErrRange
 	}
-	cast := int64(*v)
+	if bf.Cmp(minInt64BigFloat) < 0 || bf.Cmp(maxInt64BigFloat) > 0 {
+		return nil, strconv.ErrRange
+	}
+	cast, _ := bf.Int64()
 	return &cast, nil
 }
 
