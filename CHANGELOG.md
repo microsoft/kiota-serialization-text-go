@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.8](https://github.com/microsoft/kiota-serialization-text-go/compare/v1.1.7...v1.1.8) (2026-11-11)
+
+
+### Bug Fixes
+
+* **text:** define NilWriterError sentinel and update writer methods ([8f88373](https://github.com/microsoft/kiota-serialization-text-go/commit/8f883734a5b6c229a92ed5ba96bf830a80487976))
+* **text:** improve primitive parsing robustness, float32 precision, and scalar writer validation ([8c883d1](https://github.com/microsoft/kiota-serialization-text-go/commit/8c883d123ec74b3e3d434037eb24887089f0df0e))
+* **text:** improve whitespace tolerance, base64 decoding, and writer nil safety ([4a4931b](https://github.com/microsoft/kiota-serialization-text-go/commit/4a4931ba8354b733a6716806c4cb3faf72396d21))
+* **text:** operate directly on value without storing raw payload ([281edc3](https://github.com/microsoft/kiota-serialization-text-go/commit/281edc38e21287c4e26a663334135d3e53bd40f9))
+* **text:** parse decimal and exponent int64 inputs with multi-precision float ([20bf73d](https://github.com/microsoft/kiota-serialization-text-go/commit/20bf73d071abbd0b3cc70b8dc422ad671d2ef1a4))
+* **text:** preserve raw quotes to enforce rejection in typed getters ([f2b81ba](https://github.com/microsoft/kiota-serialization-text-go/commit/f2b81baec4cd6ed863b119729194c9298ce745f5))
+* **text:** strip UTF-8 byte order mark during parse node initialization ([f8272d4](https://github.com/microsoft/kiota-serialization-text-go/commit/f8272d4b471adef4182e6c75cbb59081fe71e0fa))
+* **text:** use exact rational comparison to prevent decimal rounding onto int64 bounds ([68b1370](https://github.com/microsoft/kiota-serialization-text-go/commit/68b1370029edef3fcae49de0e17e71821a76af85))
+* **text:** validate float syntax before rational parsing in GetInt64Value ([ecd146a](https://github.com/microsoft/kiota-serialization-text-go/commit/ecd146ac7892e84459a6baa29e1eaf0fea4405d6))
+
 ## [1.1.7](https://github.com/microsoft/kiota-serialization-text-go/compare/v1.1.6...v1.1.7) (2026-10-27)
 
 
