@@ -84,12 +84,17 @@ func (n *TextParseNode) GetStringValue() (*string, error) {
 	return &val, nil
 }
 
-// GetBoolValue returns a Bool value from the nodes.
+// GetBoolValue returns a Bool value from the nodes. Leading and trailing whitespace
+// and newlines are trimmed. Quoted values are preserved as-is and rejected as invalid syntax.
 func (n *TextParseNode) GetBoolValue() (*bool, error) {
 	if n == nil {
 		return nil, nil
 	}
-	val, err := strconv.ParseBool(n.value)
+	trimmed := strings.TrimSpace(n.value)
+	if trimmed == "" {
+		return nil, nil
+	}
+	val, err := strconv.ParseBool(trimmed)
 	if err != nil {
 		return nil, err
 	}
@@ -237,40 +242,43 @@ func (n *TextParseNode) GetTimeValue() (*time.Time, error) {
 	return &parsed, nil
 }
 
-// GetISODurationValue returns a ISODuration value from the nodes.
+// GetISODurationValue returns a ISODuration value from the nodes. Leading and trailing whitespace
+// and newlines are trimmed. Quoted values are preserved as-is and rejected as invalid syntax.
 func (n *TextParseNode) GetISODurationValue() (*absser.ISODuration, error) {
-	v, err := n.GetStringValue()
-	if err != nil {
-		return nil, err
-	}
-	if v == nil {
+	if n == nil {
 		return nil, nil
 	}
-	return absser.ParseISODuration(*v)
+	trimmed := strings.TrimSpace(n.value)
+	if trimmed == "" {
+		return nil, nil
+	}
+	return absser.ParseISODuration(trimmed)
 }
 
-// GetTimeOnlyValue returns a TimeOnly value from the nodes.
+// GetTimeOnlyValue returns a TimeOnly value from the nodes. Leading and trailing whitespace
+// and newlines are trimmed. Quoted values are preserved as-is and rejected as invalid syntax.
 func (n *TextParseNode) GetTimeOnlyValue() (*absser.TimeOnly, error) {
-	v, err := n.GetStringValue()
-	if err != nil {
-		return nil, err
-	}
-	if v == nil {
+	if n == nil {
 		return nil, nil
 	}
-	return absser.ParseTimeOnly(*v)
+	trimmed := strings.TrimSpace(n.value)
+	if trimmed == "" {
+		return nil, nil
+	}
+	return absser.ParseTimeOnly(trimmed)
 }
 
-// GetDateOnlyValue returns a DateOnly value from the nodes.
+// GetDateOnlyValue returns a DateOnly value from the nodes. Leading and trailing whitespace
+// and newlines are trimmed. Quoted values are preserved as-is and rejected as invalid syntax.
 func (n *TextParseNode) GetDateOnlyValue() (*absser.DateOnly, error) {
-	v, err := n.GetStringValue()
-	if err != nil {
-		return nil, err
-	}
-	if v == nil {
+	if n == nil {
 		return nil, nil
 	}
-	return absser.ParseDateOnly(*v)
+	trimmed := strings.TrimSpace(n.value)
+	if trimmed == "" {
+		return nil, nil
+	}
+	return absser.ParseDateOnly(trimmed)
 }
 
 // GetUUIDValue returns a UUID value from the nodes.
@@ -289,31 +297,42 @@ func (n *TextParseNode) GetUUIDValue() (*uuid.UUID, error) {
 	return &parsed, nil
 }
 
-// GetEnumValue returns a Enum value from the nodes.
+// GetEnumValue returns a Enum value from the nodes. Leading and trailing whitespace
+// and newlines are trimmed. Quoted values are preserved as-is and rejected as invalid syntax.
 func (n *TextParseNode) GetEnumValue(parser absser.EnumFactory) (interface{}, error) {
 	if parser == nil {
 		return nil, errors.New("parser is nil")
 	}
-	s, err := n.GetStringValue()
-	if err != nil {
-		return nil, err
-	}
-	if s == nil {
+	if n == nil {
 		return nil, nil
 	}
-	return parser(*s)
+	trimmed := strings.TrimSpace(n.value)
+	if trimmed == "" {
+		return nil, nil
+	}
+	return parser(trimmed)
 }
 
-// GetByteArrayValue returns a ByteArray value from the nodes.
+// GetByteArrayValue returns a ByteArray value from the nodes. Leading and trailing whitespace
+// and newlines are trimmed. Quoted values are preserved as-is and rejected as invalid syntax.
 func (n *TextParseNode) GetByteArrayValue() ([]byte, error) {
-	s, err := n.GetStringValue()
-	if err != nil {
-		return nil, err
-	}
-	if s == nil {
+	if n == nil {
 		return nil, nil
 	}
-	return base64.StdEncoding.DecodeString(*s)
+	trimmed := strings.TrimSpace(n.value)
+	if trimmed == "" {
+		return nil, nil
+	}
+	if data, err := base64.StdEncoding.DecodeString(trimmed); err == nil {
+		return data, nil
+	}
+	if data, err := base64.RawStdEncoding.DecodeString(trimmed); err == nil {
+		return data, nil
+	}
+	if data, err := base64.URLEncoding.DecodeString(trimmed); err == nil {
+		return data, nil
+	}
+	return base64.RawURLEncoding.DecodeString(trimmed)
 }
 
 // GetRawValue returns a ByteArray value from the nodes.

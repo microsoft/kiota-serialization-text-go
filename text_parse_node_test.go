@@ -1,6 +1,7 @@
 package textserialization
 
 import (
+	"errors"
 	testing "testing"
 
 	"github.com/google/uuid"
@@ -392,6 +393,30 @@ func TestNilParseNodeMethods(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Nil(t, val)
 
+	boolVal, err := nilNode.GetBoolValue()
+	assert.NoError(t, err)
+	assert.Nil(t, boolVal)
+
+	durVal, err := nilNode.GetISODurationValue()
+	assert.NoError(t, err)
+	assert.Nil(t, durVal)
+
+	toVal, err := nilNode.GetTimeOnlyValue()
+	assert.NoError(t, err)
+	assert.Nil(t, toVal)
+
+	doVal, err := nilNode.GetDateOnlyValue()
+	assert.NoError(t, err)
+	assert.Nil(t, doVal)
+
+	enumVal, err := nilNode.GetEnumValue(testStatusFactory)
+	assert.NoError(t, err)
+	assert.Nil(t, enumVal)
+
+	bytesVal, err := nilNode.GetByteArrayValue()
+	assert.NoError(t, err)
+	assert.Nil(t, bytesVal)
+
 	assert.Nil(t, nilNode.GetOnBeforeAssignFieldValues())
 	assert.Error(t, nilNode.SetOnBeforeAssignFieldValues(func(p absser.Parsable) error { return nil }))
 	assert.Nil(t, nilNode.GetOnAfterAssignFieldValues())
@@ -437,6 +462,286 @@ func TestGetUUIDValueInvalidReturnsNil(t *testing.T) {
 	parsedNil, err := nilNode.GetUUIDValue()
 	assert.NoError(t, err)
 	assert.Nil(t, parsedNil)
+}
+
+type testStatus int
+
+const (
+	testStatusActive testStatus = iota
+	testStatusInactive
+)
+
+func testStatusFactory(value string) (interface{}, error) {
+	switch value {
+	case "active":
+		return testStatusActive, nil
+	case "inactive":
+		return testStatusInactive, nil
+	default:
+		return nil, errors.New("unknown status: " + value)
+	}
+}
+
+func TestGetBoolValue_WhitespaceAndNewlines(t *testing.T) {
+	for _, tc := range []struct {
+		input    string
+		expected bool
+	}{
+		{"true\n", true},
+		{"false\r\n", false},
+		{" true ", true},
+		{"\tfalse\t", false},
+		{"1\n", true},
+		{"0\r\n", false},
+	} {
+		node, err := NewTextParseNode([]byte(tc.input))
+		assert.NoError(t, err)
+		val, err := node.GetBoolValue()
+		assert.NoError(t, err)
+		assert.NotNil(t, val)
+		assert.Equal(t, tc.expected, *val)
+	}
+
+	// Whitespace only returns (nil, nil)
+	emptyNode, err := NewTextParseNode([]byte("   \n\t  "))
+	assert.NoError(t, err)
+	val, err := emptyNode.GetBoolValue()
+	assert.NoError(t, err)
+	assert.Nil(t, val)
+
+	// Values with quotes are rejected
+	for _, invalid := range []string{
+		"\"true\"\n",
+		" \" true \"\n",
+		" \" false \"\r\n",
+		" \" 1 \"\n",
+		" \" 0 \"\r\n",
+		" \"   \n\t  \" \n",
+		"\"true",
+		"true\"",
+		"\"false",
+		"false\"",
+		"\"",
+	} {
+		node, err := NewTextParseNode([]byte(invalid))
+		assert.NoError(t, err)
+		v, err := node.GetBoolValue()
+		assert.Error(t, err)
+		assert.Nil(t, v)
+	}
+}
+
+func TestGetDateOnlyValue_WhitespaceAndNewlines(t *testing.T) {
+	for _, input := range []string{
+		"2026-10-21\n",
+		" 2026-10-21\r\n",
+		"\t2026-10-21\t",
+	} {
+		node, err := NewTextParseNode([]byte(input))
+		assert.NoError(t, err)
+		dateVal, err := node.GetDateOnlyValue()
+		assert.NoError(t, err)
+		assert.NotNil(t, dateVal)
+		assert.Equal(t, "2026-10-21", dateVal.String())
+	}
+
+	emptyNode, err := NewTextParseNode([]byte("   "))
+	assert.NoError(t, err)
+	val, err := emptyNode.GetDateOnlyValue()
+	assert.NoError(t, err)
+	assert.Nil(t, val)
+
+	// Quoted values are rejected
+	for _, invalid := range []string{
+		" \" 2026-10-21 \"\n",
+		" \"   \" ",
+		"\"2026-10-21\n",
+		"\"2026-10-21",
+		"2026-10-21\"",
+	} {
+		node, err := NewTextParseNode([]byte(invalid))
+		assert.NoError(t, err)
+		v, err := node.GetDateOnlyValue()
+		assert.Error(t, err)
+		assert.Nil(t, v)
+	}
+}
+
+func TestGetTimeOnlyAndISODuration_WhitespaceAndNewlines(t *testing.T) {
+	for _, input := range []string{
+		" 15:30:00\n ",
+		"15:30:00\r\n",
+		"\t15:30:00\t",
+	} {
+		nodeTime, err := NewTextParseNode([]byte(input))
+		assert.NoError(t, err)
+		toVal, err := nodeTime.GetTimeOnlyValue()
+		assert.NoError(t, err)
+		assert.NotNil(t, toVal)
+		assert.Equal(t, "15:30:00", toVal.String())
+	}
+
+	emptyTime, err := NewTextParseNode([]byte("   \n "))
+	assert.NoError(t, err)
+	emptyTo, err := emptyTime.GetTimeOnlyValue()
+	assert.NoError(t, err)
+	assert.Nil(t, emptyTo)
+
+	for _, invalid := range []string{
+		" \" 15:30:00 \"\n ",
+		" \"   \" ",
+		"\"15:30:00\n",
+		"\"15:30:00",
+		"15:30:00\"",
+	} {
+		node, err := NewTextParseNode([]byte(invalid))
+		assert.NoError(t, err)
+		v, err := node.GetTimeOnlyValue()
+		assert.Error(t, err)
+		assert.Nil(t, v)
+	}
+
+	for _, input := range []string{
+		" PT1H\r\n ",
+		"PT1H\n",
+		"\tPT1H\t",
+	} {
+		nodeDur, err := NewTextParseNode([]byte(input))
+		assert.NoError(t, err)
+		durVal, err := nodeDur.GetISODurationValue()
+		assert.NoError(t, err)
+		assert.NotNil(t, durVal)
+		assert.Equal(t, "PT1H", durVal.String())
+	}
+
+	emptyDur, err := NewTextParseNode([]byte("   "))
+	assert.NoError(t, err)
+	emptyDurVal, err := emptyDur.GetISODurationValue()
+	assert.NoError(t, err)
+	assert.Nil(t, emptyDurVal)
+
+	invalidDur, err := NewTextParseNode([]byte("invalid"))
+	assert.NoError(t, err)
+	_, err = invalidDur.GetISODurationValue()
+	assert.Error(t, err)
+}
+
+func TestGetEnumValue_WhitespaceAndNewlines(t *testing.T) {
+	nodeActive, err := NewTextParseNode([]byte(" active\n "))
+	assert.NoError(t, err)
+	enumVal, err := nodeActive.GetEnumValue(testStatusFactory)
+	assert.NoError(t, err)
+	assert.Equal(t, testStatusActive, enumVal)
+
+	nodeInactive, err := NewTextParseNode([]byte("inactive\r\n"))
+	assert.NoError(t, err)
+	enumVal, err = nodeInactive.GetEnumValue(testStatusFactory)
+	assert.NoError(t, err)
+	assert.Equal(t, testStatusInactive, enumVal)
+
+	emptyNode, err := NewTextParseNode([]byte("   "))
+	assert.NoError(t, err)
+	val, err := emptyNode.GetEnumValue(testStatusFactory)
+	assert.NoError(t, err)
+	assert.Nil(t, val)
+
+	for _, invalid := range []string{
+		" \" active \"\n ",
+		" \" inactive \"\r\n",
+		" \"   \" ",
+		"\"active\n",
+		"\"active",
+		"active\"",
+	} {
+		node, err := NewTextParseNode([]byte(invalid))
+		assert.NoError(t, err)
+		v, err := node.GetEnumValue(testStatusFactory)
+		assert.Error(t, err)
+		assert.Nil(t, v)
+	}
+}
+
+func TestGetByteArrayValue_WhitespaceAndEncodings(t *testing.T) {
+	expected := []byte("Hello world")
+
+	for _, input := range []string{
+		"SGVsbG8gd29ybGQ=",
+		"  SGVsbG8gd29ybGQ= \n",
+		"SGVsbG8gd29ybGQ",
+	} {
+		node, err := NewTextParseNode([]byte(input))
+		assert.NoError(t, err)
+		data, err := node.GetByteArrayValue()
+		assert.NoError(t, err)
+		assert.Equal(t, expected, data)
+	}
+
+	// URL-safe encoded binary data
+	urlPaddedNode, err := NewTextParseNode([]byte("-_=="))
+	assert.NoError(t, err)
+	data, err := urlPaddedNode.GetByteArrayValue()
+	assert.NoError(t, err)
+	assert.Equal(t, []byte{251}, data)
+
+	urlRawNode, err := NewTextParseNode([]byte("-_"))
+	assert.NoError(t, err)
+	data, err = urlRawNode.GetByteArrayValue()
+	assert.NoError(t, err)
+	assert.Equal(t, []byte{251}, data)
+
+	// Whitespace only returns (nil, nil)
+	emptyNode, err := NewTextParseNode([]byte("   \n "))
+	assert.NoError(t, err)
+	emptyData, err := emptyNode.GetByteArrayValue()
+	assert.NoError(t, err)
+	assert.Nil(t, emptyData)
+
+	// Invalid base64 and quoted inputs return error
+	for _, invalid := range []string{
+		"!!invalid!!",
+		"\"SGVsbG8gd29ybGQ=\"\r\n",
+		" \" SGVsbG8gd29ybGQ= \"\n",
+		" \"   \" ",
+		"\"SGVsbG8=",
+		"SGVsbG8=\"",
+	} {
+		node, err := NewTextParseNode([]byte(invalid))
+		assert.NoError(t, err)
+		_, err = node.GetByteArrayValue()
+		assert.Error(t, err)
+	}
+}
+
+func TestScalarParsers_RejectQuotedValues(t *testing.T) {
+	// Plain text serialization format does not strip enclosing quotes per maintainer guidance.
+	// Quoted strings are treated as invalid syntax for scalar types (bool, temporal, enum, etc.).
+	for _, invalid := range []string{"\"15:30:00", "15:30:00\"", " \"15:30:00\" ", "\"15:30:00\"\n"} {
+		node, err := NewTextParseNode([]byte(invalid))
+		assert.NoError(t, err)
+		_, err = node.GetTimeOnlyValue()
+		assert.Error(t, err)
+	}
+
+	for _, invalid := range []string{"\"2026-10-21", "2026-10-21\"", " \"2026-10-21\" ", "\"2026-10-21\"\r\n"} {
+		node, err := NewTextParseNode([]byte(invalid))
+		assert.NoError(t, err)
+		_, err = node.GetDateOnlyValue()
+		assert.Error(t, err)
+	}
+
+	for _, invalid := range []string{"\"active", "active\"", " \"active\" ", "\"active\"\n"} {
+		node, err := NewTextParseNode([]byte(invalid))
+		assert.NoError(t, err)
+		_, err = node.GetEnumValue(testStatusFactory)
+		assert.Error(t, err)
+	}
+
+	for _, invalid := range []string{"\"true", "true\"", " \"true\" ", "\"true\"\n", "\"false\"\r\n", " \" true \"\n"} {
+		node, err := NewTextParseNode([]byte(invalid))
+		assert.NoError(t, err)
+		_, err = node.GetBoolValue()
+		assert.Error(t, err)
+	}
 }
 
 func TestGetStringValue_WithUTF8BOM(t *testing.T) {
