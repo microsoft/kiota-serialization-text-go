@@ -16,7 +16,6 @@ import (
 // TextParseNode is a ParseNode implementation for text.
 type TextParseNode struct {
 	value                     string
-	raw                       string
 	onBeforeAssignFieldValues absser.ParsableAction
 	onAfterAssignFieldValues  absser.ParsableAction
 }
@@ -34,25 +33,13 @@ func NewTextParseNode(content []byte) (*TextParseNode, error) {
 // loadTextTree initializes a TextParseNode, stripping enclosing double quotes when the content
 // is wrapped with matching quotes and has length of at least 2.
 func loadTextTree(content []byte) (*TextParseNode, error) {
-	raw := string(content)
-	val := raw
+	val := string(content)
 	if len(val) >= 2 && strings.HasPrefix(val, "\"") && strings.HasSuffix(val, "\"") {
 		val = val[1 : len(val)-1]
 	}
 	return &TextParseNode{
 		value: val,
-		raw:   raw,
 	}, nil
-}
-
-func (n *TextParseNode) getRawText() string {
-	if n == nil {
-		return ""
-	}
-	if n.raw != "" {
-		return n.raw
-	}
-	return n.value
 }
 
 // GetChildNode returns a new parse node for the given identifier.
@@ -95,7 +82,7 @@ func (n *TextParseNode) GetBoolValue() (*bool, error) {
 	if n == nil {
 		return nil, nil
 	}
-	trimmed := strings.TrimSpace(n.getRawText())
+	trimmed := strings.TrimSpace(n.value)
 	if trimmed == "" {
 		return nil, nil
 	}
@@ -220,12 +207,9 @@ func (n *TextParseNode) GetISODurationValue() (*absser.ISODuration, error) {
 	if n == nil {
 		return nil, nil
 	}
-	trimmed := strings.TrimSpace(n.getRawText())
+	trimmed := strings.TrimSpace(n.value)
 	if trimmed == "" {
 		return nil, nil
-	}
-	if strings.Contains(trimmed, "\"") {
-		return nil, errors.New("cannot parse duration with quotes")
 	}
 	return absser.ParseISODuration(trimmed)
 }
@@ -236,7 +220,7 @@ func (n *TextParseNode) GetTimeOnlyValue() (*absser.TimeOnly, error) {
 	if n == nil {
 		return nil, nil
 	}
-	trimmed := strings.TrimSpace(n.getRawText())
+	trimmed := strings.TrimSpace(n.value)
 	if trimmed == "" {
 		return nil, nil
 	}
@@ -249,7 +233,7 @@ func (n *TextParseNode) GetDateOnlyValue() (*absser.DateOnly, error) {
 	if n == nil {
 		return nil, nil
 	}
-	trimmed := strings.TrimSpace(n.getRawText())
+	trimmed := strings.TrimSpace(n.value)
 	if trimmed == "" {
 		return nil, nil
 	}
@@ -278,12 +262,9 @@ func (n *TextParseNode) GetEnumValue(parser absser.EnumFactory) (interface{}, er
 	if n == nil {
 		return nil, nil
 	}
-	trimmed := strings.TrimSpace(n.getRawText())
+	trimmed := strings.TrimSpace(n.value)
 	if trimmed == "" {
 		return nil, nil
-	}
-	if strings.Contains(trimmed, "\"") {
-		return nil, errors.New("cannot parse enum with quotes")
 	}
 	return parser(trimmed)
 }
@@ -294,7 +275,7 @@ func (n *TextParseNode) GetByteArrayValue() ([]byte, error) {
 	if n == nil {
 		return nil, nil
 	}
-	trimmed := strings.TrimSpace(n.getRawText())
+	trimmed := strings.TrimSpace(n.value)
 	if trimmed == "" {
 		return nil, nil
 	}
