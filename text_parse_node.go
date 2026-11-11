@@ -5,12 +5,19 @@ import (
 	"bytes"
 	"encoding/base64"
 	"errors"
+	"math"
+	"math/big"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/google/uuid"
 	absser "github.com/microsoft/kiota-abstractions-go/serialization"
+)
+
+var (
+	minInt64Rat = new(big.Rat).SetInt64(math.MinInt64)
+	maxInt64Rat = new(big.Rat).SetInt64(math.MaxInt64)
 )
 
 // TextParseNode is a ParseNode implementation for text.
@@ -30,6 +37,7 @@ func NewTextParseNode(content []byte) (*TextParseNode, error) {
 	value, err := loadTextTree(content)
 	return value, err
 }
+
 // loadTextTree initializes a TextParseNode, stripping enclosing double quotes when the content
 // is wrapped with matching quotes and has length of at least 2.
 func loadTextTree(content []byte) (*TextParseNode, error) {
@@ -98,11 +106,23 @@ func (n *TextParseNode) GetInt8Value() (*int8, error) {
 	if n == nil {
 		return nil, nil
 	}
-	val, err := strconv.ParseInt(n.value, 0, 8)
+	if parsed, err := strconv.ParseInt(n.value, 10, 8); err == nil {
+		cast := int8(parsed)
+		return &cast, nil
+	} else if !errors.Is(err, strconv.ErrSyntax) && !strings.ContainsAny(n.value, ".eE") {
+		return nil, err
+	}
+	v, err := n.GetFloat64Value()
 	if err != nil {
 		return nil, err
 	}
-	cast := int8(val)
+	if v == nil {
+		return nil, nil
+	}
+	if !(*v >= -128 && *v <= 127) {
+		return nil, strconv.ErrRange
+	}
+	cast := int8(*v)
 	return &cast, nil
 }
 
@@ -111,16 +131,13 @@ func (n *TextParseNode) GetByteValue() (*byte, error) {
 	if n == nil {
 		return nil, nil
 	}
-	val, err := strconv.ParseUint(strings.TrimPrefix(n.value, "+"), 0, 8)
-	if err != nil {
+	cleaned := strings.TrimPrefix(n.value, "+")
+	if parsed, err := strconv.ParseUint(cleaned, 10, 8); err == nil {
+		cast := byte(parsed)
+		return &cast, nil
+	} else if !errors.Is(err, strconv.ErrSyntax) && !strings.ContainsAny(cleaned, ".eE") {
 		return nil, err
 	}
-	cast := byte(val)
-	return &cast, nil
-}
-
-// GetFloat32Value returns a Float32 value from the nodes.
-func (n *TextParseNode) GetFloat32Value() (*float32, error) {
 	v, err := n.GetFloat64Value()
 	if err != nil {
 		return nil, err
@@ -128,7 +145,23 @@ func (n *TextParseNode) GetFloat32Value() (*float32, error) {
 	if v == nil {
 		return nil, nil
 	}
-	cast := float32(*v)
+	if !(*v >= 0 && *v <= 255) {
+		return nil, strconv.ErrRange
+	}
+	cast := byte(*v)
+	return &cast, nil
+}
+
+// GetFloat32Value returns a Float32 value from the nodes.
+func (n *TextParseNode) GetFloat32Value() (*float32, error) {
+	if n == nil {
+		return nil, nil
+	}
+	val, err := strconv.ParseFloat(n.value, 32)
+	if err != nil {
+		return nil, err
+	}
+	cast := float32(val)
 	return &cast, nil
 }
 
@@ -137,12 +170,11 @@ func (n *TextParseNode) GetFloat64Value() (*float64, error) {
 	if n == nil {
 		return nil, nil
 	}
-	val, err := strconv.ParseFloat(n.value, 0)
+	val, err := strconv.ParseFloat(n.value, 64)
 	if err != nil {
 		return nil, err
 	}
-	cast := float64(val)
-	return &cast, nil
+	return &val, nil
 }
 
 // GetInt32Value returns a Int32 value from the nodes.
@@ -163,6 +195,9 @@ func (n *TextParseNode) GetInt32Value() (*int32, error) {
 	if v == nil {
 		return nil, nil
 	}
+	if !(*v >= -2147483648 && *v <= 2147483647) {
+		return nil, strconv.ErrRange
+	}
 	cast := int32(*v)
 	return &cast, nil
 }
@@ -177,14 +212,19 @@ func (n *TextParseNode) GetInt64Value() (*int64, error) {
 	} else if !errors.Is(err, strconv.ErrSyntax) && !strings.ContainsAny(n.value, ".eE") {
 		return nil, err
 	}
-	v, err := n.GetFloat64Value()
-	if err != nil {
+	if _, err := strconv.ParseFloat(n.value, 64); err != nil && errors.Is(err, strconv.ErrSyntax) {
 		return nil, err
 	}
-	if v == nil {
-		return nil, nil
+	rat, ok := new(big.Rat).SetString(n.value)
+	if !ok {
+		return nil, strconv.ErrSyntax
 	}
-	cast := int64(*v)
+	if rat.Cmp(minInt64Rat) < 0 || rat.Cmp(maxInt64Rat) > 0 {
+		return nil, strconv.ErrRange
+	}
+	var intVal big.Int
+	intVal.Quo(rat.Num(), rat.Denom())
+	cast := intVal.Int64()
 	return &cast, nil
 }
 
@@ -198,7 +238,10 @@ func (n *TextParseNode) GetTimeValue() (*time.Time, error) {
 		return nil, nil
 	}
 	parsed, err := time.Parse(time.RFC3339, *v)
-	return &parsed, err
+	if err != nil {
+		return nil, err
+	}
+	return &parsed, nil
 }
 
 // GetISODurationValue returns a ISODuration value from the nodes. Leading and trailing whitespace
@@ -250,7 +293,10 @@ func (n *TextParseNode) GetUUIDValue() (*uuid.UUID, error) {
 		return nil, nil
 	}
 	parsed, err := uuid.Parse(*v)
-	return &parsed, err
+	if err != nil {
+		return nil, err
+	}
+	return &parsed, nil
 }
 
 // GetEnumValue returns a Enum value from the nodes. Leading and trailing whitespace
