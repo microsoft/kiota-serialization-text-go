@@ -16,8 +16,8 @@ import (
 )
 
 var (
-	minInt64BigFloat = new(big.Float).SetPrec(128).SetInt64(math.MinInt64)
-	maxInt64BigFloat = new(big.Float).SetPrec(128).SetInt64(math.MaxInt64)
+	minInt64Rat = new(big.Rat).SetInt64(math.MinInt64)
+	maxInt64Rat = new(big.Rat).SetInt64(math.MaxInt64)
 )
 
 // TextParseNode is a ParseNode implementation for text.
@@ -212,17 +212,16 @@ func (n *TextParseNode) GetInt64Value() (*int64, error) {
 	} else if !errors.Is(err, strconv.ErrSyntax) && !strings.ContainsAny(n.value, ".eE") {
 		return nil, err
 	}
-	bf, _, err := new(big.Float).SetPrec(128).Parse(n.value, 10)
-	if err != nil {
-		return nil, err
+	rat, ok := new(big.Rat).SetString(n.value)
+	if !ok {
+		return nil, strconv.ErrSyntax
 	}
-	if bf.IsInf() {
+	if rat.Cmp(minInt64Rat) < 0 || rat.Cmp(maxInt64Rat) > 0 {
 		return nil, strconv.ErrRange
 	}
-	if bf.Cmp(minInt64BigFloat) < 0 || bf.Cmp(maxInt64BigFloat) > 0 {
-		return nil, strconv.ErrRange
-	}
-	cast, _ := bf.Int64()
+	var intVal big.Int
+	intVal.Quo(rat.Num(), rat.Denom())
+	cast := intVal.Int64()
 	return &cast, nil
 }
 

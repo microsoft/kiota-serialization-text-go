@@ -368,6 +368,8 @@ func TestGetInt64Value(t *testing.T) {
 
 	t.Run("rejects coerced float overflow int64", func(t *testing.T) {
 		for _, input := range []string{
+			"9223372036854775807.000000000000000000001",
+			"-9223372036854775808.000000000000000000001",
 			"9223372036854775808.0",
 			"9223372036854775808e0",
 			"9.223372036854775808e18",
