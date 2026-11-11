@@ -212,6 +212,9 @@ func (n *TextParseNode) GetInt64Value() (*int64, error) {
 	} else if !errors.Is(err, strconv.ErrSyntax) && !strings.ContainsAny(n.value, ".eE") {
 		return nil, err
 	}
+	if _, err := strconv.ParseFloat(n.value, 64); err != nil && errors.Is(err, strconv.ErrSyntax) {
+		return nil, err
+	}
 	rat, ok := new(big.Rat).SetString(n.value)
 	if !ok {
 		return nil, strconv.ErrSyntax

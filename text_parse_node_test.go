@@ -2,6 +2,7 @@ package textserialization
 
 import (
 	"errors"
+	"strconv"
 	testing "testing"
 
 	"github.com/google/uuid"
@@ -384,6 +385,22 @@ func TestGetInt64Value(t *testing.T) {
 			assert.NoError(t, err)
 			val, err := node.GetInt64Value()
 			assert.Error(t, err)
+			assert.Nil(t, val)
+		}
+	})
+
+	t.Run("rejects non-numeric scalar syntax", func(t *testing.T) {
+		for _, input := range []string{
+			"1/2",
+			"0x10",
+			"1.2.3",
+			"foo",
+		} {
+			node, err := NewTextParseNode([]byte(input))
+			assert.NoError(t, err)
+			val, err := node.GetInt64Value()
+			assert.Error(t, err)
+			assert.True(t, errors.Is(err, strconv.ErrSyntax), "input %q should fail with ErrSyntax, got %v", input, err)
 			assert.Nil(t, val)
 		}
 	})
