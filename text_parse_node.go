@@ -228,16 +228,17 @@ func (n *TextParseNode) GetInt64Value() (*int64, error) {
 	return &cast, nil
 }
 
-// GetTimeValue returns a Time value from the nodes.
+// GetTimeValue returns a Time value from the nodes. Leading and trailing whitespace
+// and newlines are trimmed. Quoted values are preserved as-is and rejected as invalid syntax.
 func (n *TextParseNode) GetTimeValue() (*time.Time, error) {
-	v, err := n.GetStringValue()
-	if err != nil {
-		return nil, err
-	}
-	if v == nil {
+	if n == nil {
 		return nil, nil
 	}
-	parsed, err := time.Parse(time.RFC3339, *v)
+	trimmed := strings.TrimSpace(n.value)
+	if trimmed == "" {
+		return nil, nil
+	}
+	parsed, err := time.Parse(time.RFC3339, trimmed)
 	if err != nil {
 		return nil, err
 	}
@@ -283,16 +284,17 @@ func (n *TextParseNode) GetDateOnlyValue() (*absser.DateOnly, error) {
 	return absser.ParseDateOnly(trimmed)
 }
 
-// GetUUIDValue returns a UUID value from the nodes.
+// GetUUIDValue returns a UUID value from the nodes. Leading and trailing whitespace
+// and newlines are trimmed. Quoted values are preserved as-is and rejected as invalid syntax.
 func (n *TextParseNode) GetUUIDValue() (*uuid.UUID, error) {
-	v, err := n.GetStringValue()
-	if err != nil {
-		return nil, err
-	}
-	if v == nil {
+	if n == nil {
 		return nil, nil
 	}
-	parsed, err := uuid.Parse(*v)
+	trimmed := strings.TrimSpace(n.value)
+	if trimmed == "" {
+		return nil, nil
+	}
+	parsed, err := uuid.Parse(trimmed)
 	if err != nil {
 		return nil, err
 	}
