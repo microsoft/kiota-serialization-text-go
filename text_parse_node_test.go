@@ -436,6 +436,62 @@ func TestNilParseNodeMethods(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Nil(t, bytesVal)
 
+	child, err := nilNode.GetChildNode("foo")
+	assert.NoError(t, err)
+	assert.Nil(t, child)
+
+	obj, err := nilNode.GetObjectValue(nil)
+	assert.NoError(t, err)
+	assert.Nil(t, obj)
+
+	objColl, err := nilNode.GetCollectionOfObjectValues(nil)
+	assert.NoError(t, err)
+	assert.Nil(t, objColl)
+
+	primColl, err := nilNode.GetCollectionOfPrimitiveValues("string")
+	assert.NoError(t, err)
+	assert.Nil(t, primColl)
+
+	enumColl, err := nilNode.GetCollectionOfEnumValues(nil)
+	assert.NoError(t, err)
+	assert.Nil(t, enumColl)
+
+	strVal, err := nilNode.GetStringValue()
+	assert.NoError(t, err)
+	assert.Nil(t, strVal)
+
+	int8Val, err := nilNode.GetInt8Value()
+	assert.NoError(t, err)
+	assert.Nil(t, int8Val)
+
+	byteVal, err := nilNode.GetByteValue()
+	assert.NoError(t, err)
+	assert.Nil(t, byteVal)
+
+	int32Val, err := nilNode.GetInt32Value()
+	assert.NoError(t, err)
+	assert.Nil(t, int32Val)
+
+	int64Val, err := nilNode.GetInt64Value()
+	assert.NoError(t, err)
+	assert.Nil(t, int64Val)
+
+	f32Val, err := nilNode.GetFloat32Value()
+	assert.NoError(t, err)
+	assert.Nil(t, f32Val)
+
+	f64Val, err := nilNode.GetFloat64Value()
+	assert.NoError(t, err)
+	assert.Nil(t, f64Val)
+
+	timeVal, err := nilNode.GetTimeValue()
+	assert.NoError(t, err)
+	assert.Nil(t, timeVal)
+
+	uuidVal, err := nilNode.GetUUIDValue()
+	assert.NoError(t, err)
+	assert.Nil(t, uuidVal)
+
 	assert.Nil(t, nilNode.GetOnBeforeAssignFieldValues())
 	assert.Error(t, nilNode.SetOnBeforeAssignFieldValues(func(p absser.Parsable) error { return nil }))
 	assert.Nil(t, nilNode.GetOnAfterAssignFieldValues())
