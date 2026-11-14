@@ -731,6 +731,48 @@ func TestGetByteArrayValue_WhitespaceAndEncodings(t *testing.T) {
 	}
 }
 
+func TestGetTimeValue_WhitespaceAndNewlines(t *testing.T) {
+	for _, input := range []string{
+		" 2026-10-21T15:30:00Z\n",
+		"2026-10-21T15:30:00Z\r\n",
+		"\t2026-10-21T15:30:00.123456789Z\t",
+	} {
+		node, err := NewTextParseNode([]byte(input))
+		assert.NoError(t, err)
+		parsed, err := node.GetTimeValue()
+		assert.NoError(t, err)
+		assert.NotNil(t, parsed)
+	}
+
+	emptyNode, err := NewTextParseNode([]byte("   \n\t "))
+	assert.NoError(t, err)
+	val, err := emptyNode.GetTimeValue()
+	assert.NoError(t, err)
+	assert.Nil(t, val)
+}
+
+func TestGetUUIDValue_WhitespaceAndNewlines(t *testing.T) {
+	expected := "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
+	for _, input := range []string{
+		" 6ba7b810-9dad-11d1-80b4-00c04fd430c8\n",
+		"6ba7b810-9dad-11d1-80b4-00c04fd430c8\r\n",
+		"\t6ba7b810-9dad-11d1-80b4-00c04fd430c8\t",
+	} {
+		node, err := NewTextParseNode([]byte(input))
+		assert.NoError(t, err)
+		parsed, err := node.GetUUIDValue()
+		assert.NoError(t, err)
+		assert.NotNil(t, parsed)
+		assert.Equal(t, expected, parsed.String())
+	}
+
+	emptyNode, err := NewTextParseNode([]byte("   \n\t "))
+	assert.NoError(t, err)
+	val, err := emptyNode.GetUUIDValue()
+	assert.NoError(t, err)
+	assert.Nil(t, val)
+}
+
 func TestScalarParsers_RejectQuotedValues(t *testing.T) {
 	// Plain text serialization format does not strip enclosing quotes per maintainer guidance.
 	// Quoted strings are treated as invalid syntax for scalar types (bool, temporal, enum, etc.).
