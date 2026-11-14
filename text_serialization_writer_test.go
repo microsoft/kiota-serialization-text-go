@@ -312,3 +312,34 @@ func TestWriteAnyValue_TypedNilSafety(t *testing.T) {
 	// Non-nil unknown value returns NoStructuredDataError
 	assert.ErrorIs(t, writer.WriteAnyValue("", "hello"), NoStructuredDataError)
 }
+
+func TestWriteCollectionsAndObject_NilSafety(t *testing.T) {
+	writer := NewTextSerializationWriter()
+
+	// Nil collections and objects return no error and write nothing
+	require.NoError(t, writer.WriteObjectValue("", nil))
+	require.NoError(t, writer.WriteCollectionOfObjectValues("", nil))
+	require.NoError(t, writer.WriteCollectionOfStringValues("", nil))
+	require.NoError(t, writer.WriteCollectionOfInt32Values("", nil))
+	require.NoError(t, writer.WriteCollectionOfInt64Values("", nil))
+	require.NoError(t, writer.WriteCollectionOfFloat32Values("", nil))
+	require.NoError(t, writer.WriteCollectionOfFloat64Values("", nil))
+	require.NoError(t, writer.WriteCollectionOfTimeValues("", nil))
+	require.NoError(t, writer.WriteCollectionOfISODurationValues("", nil))
+	require.NoError(t, writer.WriteCollectionOfTimeOnlyValues("", nil))
+	require.NoError(t, writer.WriteCollectionOfDateOnlyValues("", nil))
+	require.NoError(t, writer.WriteCollectionOfUUIDValues("", nil))
+	require.NoError(t, writer.WriteCollectionOfBoolValues("", nil))
+	require.NoError(t, writer.WriteCollectionOfByteValues("", nil))
+	require.NoError(t, writer.WriteCollectionOfInt8Values("", nil))
+
+	content, err := writer.GetSerializedContent()
+	require.NoError(t, err)
+	assert.Empty(t, content)
+
+	// Non-nil collections return NoStructuredDataError
+	assert.ErrorIs(t, writer.WriteCollectionOfStringValues("", []string{"a"}), NoStructuredDataError)
+	assert.ErrorIs(t, writer.WriteCollectionOfInt32Values("", []int32{1}), NoStructuredDataError)
+	assert.ErrorIs(t, writer.WriteCollectionOfBoolValues("", []bool{true}), NoStructuredDataError)
+	assert.ErrorIs(t, writer.WriteCollectionOfByteValues("", []byte{1}), NoStructuredDataError)
+}
