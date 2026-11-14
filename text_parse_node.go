@@ -52,26 +52,41 @@ func loadTextTree(content []byte) (*TextParseNode, error) {
 
 // GetChildNode returns a new parse node for the given identifier.
 func (n *TextParseNode) GetChildNode(index string) (absser.ParseNode, error) {
+	if n == nil {
+		return nil, nil
+	}
 	return nil, NoStructuredDataError
 }
 
 // GetObjectValue returns the Parsable value from the node.
 func (n *TextParseNode) GetObjectValue(ctor absser.ParsableFactory) (absser.Parsable, error) {
+	if n == nil {
+		return nil, nil
+	}
 	return nil, NoStructuredDataError
 }
 
 // GetCollectionOfObjectValues returns the collection of Parsable values from the node.
 func (n *TextParseNode) GetCollectionOfObjectValues(ctor absser.ParsableFactory) ([]absser.Parsable, error) {
+	if n == nil {
+		return nil, nil
+	}
 	return nil, NoStructuredDataError
 }
 
 // GetCollectionOfPrimitiveValues returns the collection of primitive values from the node.
 func (n *TextParseNode) GetCollectionOfPrimitiveValues(targetType string) ([]interface{}, error) {
+	if n == nil {
+		return nil, nil
+	}
 	return nil, NoStructuredDataError
 }
 
 // GetCollectionOfEnumValues returns the collection of Enum values from the node.
 func (n *TextParseNode) GetCollectionOfEnumValues(parser absser.EnumFactory) ([]interface{}, error) {
+	if n == nil {
+		return nil, nil
+	}
 	return nil, NoStructuredDataError
 }
 
