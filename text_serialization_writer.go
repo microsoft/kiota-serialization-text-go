@@ -178,6 +178,18 @@ func (w *TextSerializationWriter) WriteObjectValue(key string, item absser.Parsa
 	if w == nil {
 		return NilWriterError
 	}
+	if isNil(item) {
+		allNil := true
+		for _, additional := range additionalValuesToMerge {
+			if !isNil(additional) {
+				allNil = false
+				break
+			}
+		}
+		if allNil {
+			return nil
+		}
+	}
 	return NoStructuredDataError
 }
 
@@ -185,6 +197,9 @@ func (w *TextSerializationWriter) WriteObjectValue(key string, item absser.Parsa
 func (w *TextSerializationWriter) WriteCollectionOfObjectValues(key string, collection []absser.Parsable) error {
 	if w == nil {
 		return NilWriterError
+	}
+	if collection == nil {
+		return nil
 	}
 	return NoStructuredDataError
 }
@@ -194,6 +209,9 @@ func (w *TextSerializationWriter) WriteCollectionOfStringValues(key string, coll
 	if w == nil {
 		return NilWriterError
 	}
+	if collection == nil {
+		return nil
+	}
 	return NoStructuredDataError
 }
 
@@ -201,6 +219,9 @@ func (w *TextSerializationWriter) WriteCollectionOfStringValues(key string, coll
 func (w *TextSerializationWriter) WriteCollectionOfInt32Values(key string, collection []int32) error {
 	if w == nil {
 		return NilWriterError
+	}
+	if collection == nil {
+		return nil
 	}
 	return NoStructuredDataError
 }
@@ -210,6 +231,9 @@ func (w *TextSerializationWriter) WriteCollectionOfInt64Values(key string, colle
 	if w == nil {
 		return NilWriterError
 	}
+	if collection == nil {
+		return nil
+	}
 	return NoStructuredDataError
 }
 
@@ -217,6 +241,9 @@ func (w *TextSerializationWriter) WriteCollectionOfInt64Values(key string, colle
 func (w *TextSerializationWriter) WriteCollectionOfFloat32Values(key string, collection []float32) error {
 	if w == nil {
 		return NilWriterError
+	}
+	if collection == nil {
+		return nil
 	}
 	return NoStructuredDataError
 }
@@ -226,6 +253,9 @@ func (w *TextSerializationWriter) WriteCollectionOfFloat64Values(key string, col
 	if w == nil {
 		return NilWriterError
 	}
+	if collection == nil {
+		return nil
+	}
 	return NoStructuredDataError
 }
 
@@ -233,6 +263,9 @@ func (w *TextSerializationWriter) WriteCollectionOfFloat64Values(key string, col
 func (w *TextSerializationWriter) WriteCollectionOfTimeValues(key string, collection []time.Time) error {
 	if w == nil {
 		return NilWriterError
+	}
+	if collection == nil {
+		return nil
 	}
 	return NoStructuredDataError
 }
@@ -242,6 +275,9 @@ func (w *TextSerializationWriter) WriteCollectionOfISODurationValues(key string,
 	if w == nil {
 		return NilWriterError
 	}
+	if collection == nil {
+		return nil
+	}
 	return NoStructuredDataError
 }
 
@@ -249,6 +285,9 @@ func (w *TextSerializationWriter) WriteCollectionOfISODurationValues(key string,
 func (w *TextSerializationWriter) WriteCollectionOfTimeOnlyValues(key string, collection []absser.TimeOnly) error {
 	if w == nil {
 		return NilWriterError
+	}
+	if collection == nil {
+		return nil
 	}
 	return NoStructuredDataError
 }
@@ -258,6 +297,9 @@ func (w *TextSerializationWriter) WriteCollectionOfDateOnlyValues(key string, co
 	if w == nil {
 		return NilWriterError
 	}
+	if collection == nil {
+		return nil
+	}
 	return NoStructuredDataError
 }
 
@@ -265,6 +307,9 @@ func (w *TextSerializationWriter) WriteCollectionOfDateOnlyValues(key string, co
 func (w *TextSerializationWriter) WriteCollectionOfUUIDValues(key string, collection []uuid.UUID) error {
 	if w == nil {
 		return NilWriterError
+	}
+	if collection == nil {
+		return nil
 	}
 	return NoStructuredDataError
 }
@@ -274,6 +319,9 @@ func (w *TextSerializationWriter) WriteCollectionOfBoolValues(key string, collec
 	if w == nil {
 		return NilWriterError
 	}
+	if collection == nil {
+		return nil
+	}
 	return NoStructuredDataError
 }
 
@@ -282,6 +330,9 @@ func (w *TextSerializationWriter) WriteCollectionOfByteValues(key string, collec
 	if w == nil {
 		return NilWriterError
 	}
+	if collection == nil {
+		return nil
+	}
 	return NoStructuredDataError
 }
 
@@ -289,6 +340,9 @@ func (w *TextSerializationWriter) WriteCollectionOfByteValues(key string, collec
 func (w *TextSerializationWriter) WriteCollectionOfInt8Values(key string, collection []int8) error {
 	if w == nil {
 		return NilWriterError
+	}
+	if collection == nil {
+		return nil
 	}
 	return NoStructuredDataError
 }

@@ -312,3 +312,83 @@ func TestWriteAnyValue_TypedNilSafety(t *testing.T) {
 	// Non-nil unknown value returns NoStructuredDataError
 	assert.ErrorIs(t, writer.WriteAnyValue("", "hello"), NoStructuredDataError)
 }
+
+func TestWriteCollectionsAndObject_NilSafety(t *testing.T) {
+	writer := NewTextSerializationWriter()
+
+	// Nil collections and objects return no error and write nothing
+	require.NoError(t, writer.WriteObjectValue("", nil))
+	require.NoError(t, writer.WriteCollectionOfObjectValues("", nil))
+	require.NoError(t, writer.WriteCollectionOfStringValues("", nil))
+	require.NoError(t, writer.WriteCollectionOfInt32Values("", nil))
+	require.NoError(t, writer.WriteCollectionOfInt64Values("", nil))
+	require.NoError(t, writer.WriteCollectionOfFloat32Values("", nil))
+	require.NoError(t, writer.WriteCollectionOfFloat64Values("", nil))
+	require.NoError(t, writer.WriteCollectionOfTimeValues("", nil))
+	require.NoError(t, writer.WriteCollectionOfISODurationValues("", nil))
+	require.NoError(t, writer.WriteCollectionOfTimeOnlyValues("", nil))
+	require.NoError(t, writer.WriteCollectionOfDateOnlyValues("", nil))
+	require.NoError(t, writer.WriteCollectionOfUUIDValues("", nil))
+	require.NoError(t, writer.WriteCollectionOfBoolValues("", nil))
+	require.NoError(t, writer.WriteCollectionOfByteValues("", nil))
+	require.NoError(t, writer.WriteCollectionOfInt8Values("", nil))
+
+	content, err := writer.GetSerializedContent()
+	require.NoError(t, err)
+	assert.Empty(t, content)
+
+	// Non-nil collections return NoStructuredDataError
+	assert.ErrorIs(t, writer.WriteCollectionOfStringValues("", []string{"a"}), NoStructuredDataError)
+	assert.ErrorIs(t, writer.WriteCollectionOfInt32Values("", []int32{1}), NoStructuredDataError)
+	assert.ErrorIs(t, writer.WriteCollectionOfBoolValues("", []bool{true}), NoStructuredDataError)
+	assert.ErrorIs(t, writer.WriteCollectionOfByteValues("", []byte{1}), NoStructuredDataError)
+}
+
+func TestSerializationAndDeserialization_RoundTripWithWhitespace(t *testing.T) {
+	t.Run("TimeValue round trip with whitespace", func(t *testing.T) {
+		writer := NewTextSerializationWriter()
+		expectedTime, err := time.Parse(time.RFC3339, "2026-11-14T10:00:00Z")
+		require.NoError(t, err)
+		require.NoError(t, writer.WriteTimeValue("", &expectedTime))
+		raw, err := writer.GetSerializedContent()
+		require.NoError(t, err)
+
+		// Parse with added whitespace and newlines
+		node, err := NewTextParseNode([]byte("  " + string(raw) + "\n\t"))
+		require.NoError(t, err)
+		parsedTime, err := node.GetTimeValue()
+		require.NoError(t, err)
+		require.NotNil(t, parsedTime)
+		assert.True(t, expectedTime.Equal(*parsedTime))
+	})
+
+	t.Run("UUIDValue round trip with whitespace", func(t *testing.T) {
+		writer := NewTextSerializationWriter()
+		expectedUUID := uuid.MustParse("6ba7b810-9dad-11d1-80b4-00c04fd430c8")
+		require.NoError(t, writer.WriteUUIDValue("", &expectedUUID))
+		raw, err := writer.GetSerializedContent()
+		require.NoError(t, err)
+
+		node, err := NewTextParseNode([]byte("\t" + string(raw) + "  \r\n"))
+		require.NoError(t, err)
+		parsedUUID, err := node.GetUUIDValue()
+		require.NoError(t, err)
+		require.NotNil(t, parsedUUID)
+		assert.Equal(t, expectedUUID, *parsedUUID)
+	})
+
+	t.Run("Numeric round trip with whitespace", func(t *testing.T) {
+		writer := NewTextSerializationWriter()
+		val := int64(9223372036854775807)
+		require.NoError(t, writer.WriteInt64Value("", &val))
+		raw, err := writer.GetSerializedContent()
+		require.NoError(t, err)
+
+		node, err := NewTextParseNode([]byte("  " + string(raw) + "\n"))
+		require.NoError(t, err)
+		parsedVal, err := node.GetInt64Value()
+		require.NoError(t, err)
+		require.NotNil(t, parsedVal)
+		assert.Equal(t, val, *parsedVal)
+	})
+}
