@@ -436,6 +436,62 @@ func TestNilParseNodeMethods(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Nil(t, bytesVal)
 
+	child, err := nilNode.GetChildNode("foo")
+	assert.NoError(t, err)
+	assert.Nil(t, child)
+
+	obj, err := nilNode.GetObjectValue(nil)
+	assert.NoError(t, err)
+	assert.Nil(t, obj)
+
+	objColl, err := nilNode.GetCollectionOfObjectValues(nil)
+	assert.NoError(t, err)
+	assert.Nil(t, objColl)
+
+	primColl, err := nilNode.GetCollectionOfPrimitiveValues("string")
+	assert.NoError(t, err)
+	assert.Nil(t, primColl)
+
+	enumColl, err := nilNode.GetCollectionOfEnumValues(nil)
+	assert.NoError(t, err)
+	assert.Nil(t, enumColl)
+
+	strVal, err := nilNode.GetStringValue()
+	assert.NoError(t, err)
+	assert.Nil(t, strVal)
+
+	int8Val, err := nilNode.GetInt8Value()
+	assert.NoError(t, err)
+	assert.Nil(t, int8Val)
+
+	byteVal, err := nilNode.GetByteValue()
+	assert.NoError(t, err)
+	assert.Nil(t, byteVal)
+
+	int32Val, err := nilNode.GetInt32Value()
+	assert.NoError(t, err)
+	assert.Nil(t, int32Val)
+
+	int64Val, err := nilNode.GetInt64Value()
+	assert.NoError(t, err)
+	assert.Nil(t, int64Val)
+
+	f32Val, err := nilNode.GetFloat32Value()
+	assert.NoError(t, err)
+	assert.Nil(t, f32Val)
+
+	f64Val, err := nilNode.GetFloat64Value()
+	assert.NoError(t, err)
+	assert.Nil(t, f64Val)
+
+	timeVal, err := nilNode.GetTimeValue()
+	assert.NoError(t, err)
+	assert.Nil(t, timeVal)
+
+	uuidVal, err := nilNode.GetUUIDValue()
+	assert.NoError(t, err)
+	assert.Nil(t, uuidVal)
+
 	assert.Nil(t, nilNode.GetOnBeforeAssignFieldValues())
 	assert.Error(t, nilNode.SetOnBeforeAssignFieldValues(func(p absser.Parsable) error { return nil }))
 	assert.Nil(t, nilNode.GetOnAfterAssignFieldValues())
@@ -729,6 +785,117 @@ func TestGetByteArrayValue_WhitespaceAndEncodings(t *testing.T) {
 		_, err = node.GetByteArrayValue()
 		assert.Error(t, err)
 	}
+}
+
+func TestGetTimeValue_WhitespaceAndNewlines(t *testing.T) {
+	for _, input := range []string{
+		" 2026-10-21T15:30:00Z\n",
+		"2026-10-21T15:30:00Z\r\n",
+		"\t2026-10-21T15:30:00.123456789Z\t",
+	} {
+		node, err := NewTextParseNode([]byte(input))
+		assert.NoError(t, err)
+		parsed, err := node.GetTimeValue()
+		assert.NoError(t, err)
+		assert.NotNil(t, parsed)
+	}
+
+	emptyNode, err := NewTextParseNode([]byte("   \n\t "))
+	assert.NoError(t, err)
+	val, err := emptyNode.GetTimeValue()
+	assert.NoError(t, err)
+	assert.Nil(t, val)
+}
+
+func TestGetUUIDValue_WhitespaceAndNewlines(t *testing.T) {
+	expected := "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
+	for _, input := range []string{
+		" 6ba7b810-9dad-11d1-80b4-00c04fd430c8\n",
+		"6ba7b810-9dad-11d1-80b4-00c04fd430c8\r\n",
+		"\t6ba7b810-9dad-11d1-80b4-00c04fd430c8\t",
+	} {
+		node, err := NewTextParseNode([]byte(input))
+		assert.NoError(t, err)
+		parsed, err := node.GetUUIDValue()
+		assert.NoError(t, err)
+		assert.NotNil(t, parsed)
+		assert.Equal(t, expected, parsed.String())
+	}
+
+	emptyNode, err := NewTextParseNode([]byte("   \n\t "))
+	assert.NoError(t, err)
+	val, err := emptyNode.GetUUIDValue()
+	assert.NoError(t, err)
+	assert.Nil(t, val)
+}
+
+func TestNumericGetters_WhitespaceAndNewlines(t *testing.T) {
+	t.Run("parses numbers with surrounding whitespace and newlines", func(t *testing.T) {
+		nodeI8, err := NewTextParseNode([]byte(" -42\n "))
+		assert.NoError(t, err)
+		vI8, err := nodeI8.GetInt8Value()
+		assert.NoError(t, err)
+		assert.Equal(t, int8(-42), *vI8)
+
+		nodeByte, err := NewTextParseNode([]byte("\t200\r\n"))
+		assert.NoError(t, err)
+		vByte, err := nodeByte.GetByteValue()
+		assert.NoError(t, err)
+		assert.Equal(t, byte(200), *vByte)
+
+		nodeI32, err := NewTextParseNode([]byte(" 123456\n "))
+		assert.NoError(t, err)
+		vI32, err := nodeI32.GetInt32Value()
+		assert.NoError(t, err)
+		assert.Equal(t, int32(123456), *vI32)
+
+		nodeI64, err := NewTextParseNode([]byte(" \t9223372036854775807\n"))
+		assert.NoError(t, err)
+		vI64, err := nodeI64.GetInt64Value()
+		assert.NoError(t, err)
+		assert.Equal(t, int64(9223372036854775807), *vI64)
+
+		nodeF32, err := NewTextParseNode([]byte(" 3.14\n "))
+		assert.NoError(t, err)
+		vF32, err := nodeF32.GetFloat32Value()
+		assert.NoError(t, err)
+		assert.InDelta(t, float32(3.14), *vF32, 0.001)
+
+		nodeF64, err := NewTextParseNode([]byte("\t2.718281828459\r\n"))
+		assert.NoError(t, err)
+		vF64, err := nodeF64.GetFloat64Value()
+		assert.NoError(t, err)
+		assert.InDelta(t, 2.718281828459, *vF64, 0.0000000001)
+	})
+
+	t.Run("whitespace only returns nil without error", func(t *testing.T) {
+		emptyNode, err := NewTextParseNode([]byte("   \n\t "))
+		assert.NoError(t, err)
+
+		vI8, err := emptyNode.GetInt8Value()
+		assert.NoError(t, err)
+		assert.Nil(t, vI8)
+
+		vByte, err := emptyNode.GetByteValue()
+		assert.NoError(t, err)
+		assert.Nil(t, vByte)
+
+		vI32, err := emptyNode.GetInt32Value()
+		assert.NoError(t, err)
+		assert.Nil(t, vI32)
+
+		vI64, err := emptyNode.GetInt64Value()
+		assert.NoError(t, err)
+		assert.Nil(t, vI64)
+
+		vF32, err := emptyNode.GetFloat32Value()
+		assert.NoError(t, err)
+		assert.Nil(t, vF32)
+
+		vF64, err := emptyNode.GetFloat64Value()
+		assert.NoError(t, err)
+		assert.Nil(t, vF64)
+	})
 }
 
 func TestScalarParsers_RejectQuotedValues(t *testing.T) {
