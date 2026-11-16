@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.8](https://github.com/microsoft/kiota-serialization-text-go/compare/v1.1.7...v1.1.8) (2026-11-16)
+
+
+### Bug Fixes
+
+* **text:** define NilWriterError sentinel and update writer methods ([8f88373](https://github.com/microsoft/kiota-serialization-text-go/commit/8f883734a5b6c229a92ed5ba96bf830a80487976))
+* **text:** enhance whitespace tolerance and nil receiver safety across parser and writer ([8967f16](https://github.com/microsoft/kiota-serialization-text-go/commit/8967f16c40f95656975009b562157972229a78ed))
+* **text:** improve primitive parsing robustness, float32 precision, and scalar writer validation ([8c883d1](https://github.com/microsoft/kiota-serialization-text-go/commit/8c883d123ec74b3e3d434037eb24887089f0df0e))
+* **text:** improve whitespace tolerance, base64 decoding, and writer nil safety ([4a4931b](https://github.com/microsoft/kiota-serialization-text-go/commit/4a4931ba8354b733a6716806c4cb3faf72396d21))
+* **text:** operate directly on value without storing raw payload ([281edc3](https://github.com/microsoft/kiota-serialization-text-go/commit/281edc38e21287c4e26a663334135d3e53bd40f9))
+* **text:** parse decimal and exponent int64 inputs with multi-precision float ([20bf73d](https://github.com/microsoft/kiota-serialization-text-go/commit/20bf73d071abbd0b3cc70b8dc422ad671d2ef1a4))
+* **text:** permit nil collections and objects without error in serialization writer ([a52efcb](https://github.com/microsoft/kiota-serialization-text-go/commit/a52efcbf764f55857b59eb68475043d2c1385bdf))
+* **text:** preserve raw quotes to enforce rejection in typed getters ([f2b81ba](https://github.com/microsoft/kiota-serialization-text-go/commit/f2b81baec4cd6ed863b119729194c9298ce745f5))
+* **text:** remove inaccurate doc claims and expand WriteObjectValue tests ([b293766](https://github.com/microsoft/kiota-serialization-text-go/commit/b293766bf485aedd369e0d2712a2861ba88556fd))
+* **text:** return nil without error for nil parse node structured getters ([420f773](https://github.com/microsoft/kiota-serialization-text-go/commit/420f773a51296fcaa2332a8bd2556b4345207c11))
+* **text:** strip UTF-8 byte order mark during parse node initialization ([f8272d4](https://github.com/microsoft/kiota-serialization-text-go/commit/f8272d4b471adef4182e6c75cbb59081fe71e0fa))
+* **text:** trim whitespace and support empty inputs in GetTimeValue and GetUUIDValue ([9f02309](https://github.com/microsoft/kiota-serialization-text-go/commit/9f023094041f9af9a05389ddf502c799f59f6ef9))
+* **text:** trim whitespace and support empty inputs in numeric getters ([fe3b4e6](https://github.com/microsoft/kiota-serialization-text-go/commit/fe3b4e668e2eae7e4fa9407b6e95638bdaeb92dc))
+* **text:** use exact rational comparison to prevent decimal rounding onto int64 bounds ([68b1370](https://github.com/microsoft/kiota-serialization-text-go/commit/68b1370029edef3fcae49de0e17e71821a76af85))
+* **text:** validate float syntax before rational parsing in GetInt64Value ([ecd146a](https://github.com/microsoft/kiota-serialization-text-go/commit/ecd146ac7892e84459a6baa29e1eaf0fea4405d6))
+
 ## [1.1.7](https://github.com/microsoft/kiota-serialization-text-go/compare/v1.1.6...v1.1.7) (2026-10-27)
 
 
