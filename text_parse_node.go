@@ -274,7 +274,7 @@ func (n *TextParseNode) GetInt64Value() (*int64, error) {
 }
 
 // GetTimeValue returns a Time value from the nodes. Leading and trailing whitespace
-// and newlines are trimmed. Quoted values are preserved as-is and rejected as invalid syntax.
+// and newlines are trimmed.
 func (n *TextParseNode) GetTimeValue() (*time.Time, error) {
 	if n == nil {
 		return nil, nil
@@ -330,7 +330,7 @@ func (n *TextParseNode) GetDateOnlyValue() (*absser.DateOnly, error) {
 }
 
 // GetUUIDValue returns a UUID value from the nodes. Leading and trailing whitespace
-// and newlines are trimmed. Quoted values are preserved as-is and rejected as invalid syntax.
+// and newlines are trimmed.
 func (n *TextParseNode) GetUUIDValue() (*uuid.UUID, error) {
 	if n == nil {
 		return nil, nil

@@ -313,11 +313,27 @@ func TestWriteAnyValue_TypedNilSafety(t *testing.T) {
 	assert.ErrorIs(t, writer.WriteAnyValue("", "hello"), NoStructuredDataError)
 }
 
+type mockParsable struct{}
+
+func (m *mockParsable) Serialize(writer absser.SerializationWriter) error {
+	return nil
+}
+
+func (m *mockParsable) GetFieldDeserializers() map[string]func(absser.ParseNode) error {
+	return nil
+}
+
 func TestWriteCollectionsAndObject_NilSafety(t *testing.T) {
 	writer := NewTextSerializationWriter()
 
+	var typedNil *mockParsable
+
 	// Nil collections and objects return no error and write nothing
 	require.NoError(t, writer.WriteObjectValue("", nil))
+	require.NoError(t, writer.WriteObjectValue("", typedNil))
+	require.NoError(t, writer.WriteObjectValue("", nil, nil))
+	require.NoError(t, writer.WriteObjectValue("", nil, typedNil))
+	require.NoError(t, writer.WriteObjectValue("", typedNil, nil, typedNil))
 	require.NoError(t, writer.WriteCollectionOfObjectValues("", nil))
 	require.NoError(t, writer.WriteCollectionOfStringValues("", nil))
 	require.NoError(t, writer.WriteCollectionOfInt32Values("", nil))
@@ -337,7 +353,14 @@ func TestWriteCollectionsAndObject_NilSafety(t *testing.T) {
 	require.NoError(t, err)
 	assert.Empty(t, content)
 
-	// Non-nil collections return NoStructuredDataError
+	// Non-nil objects and collections return NoStructuredDataError
+	nonNil := &mockParsable{}
+	assert.ErrorIs(t, writer.WriteObjectValue("", nonNil), NoStructuredDataError)
+	assert.ErrorIs(t, writer.WriteObjectValue("", nil, nonNil), NoStructuredDataError)
+	assert.ErrorIs(t, writer.WriteObjectValue("", typedNil, nonNil), NoStructuredDataError)
+	assert.ErrorIs(t, writer.WriteObjectValue("", nil, typedNil, nonNil), NoStructuredDataError)
+	assert.ErrorIs(t, writer.WriteObjectValue("", nonNil, nil), NoStructuredDataError)
+	assert.ErrorIs(t, writer.WriteCollectionOfObjectValues("", []absser.Parsable{nonNil}), NoStructuredDataError)
 	assert.ErrorIs(t, writer.WriteCollectionOfStringValues("", []string{"a"}), NoStructuredDataError)
 	assert.ErrorIs(t, writer.WriteCollectionOfInt32Values("", []int32{1}), NoStructuredDataError)
 	assert.ErrorIs(t, writer.WriteCollectionOfBoolValues("", []bool{true}), NoStructuredDataError)
